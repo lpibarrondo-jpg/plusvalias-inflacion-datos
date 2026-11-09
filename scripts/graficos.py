@@ -268,6 +268,62 @@ def grafico_medidas(lim_act, filas_mapa):
     plt.close(fig)
     return actual, escala, base
 
+# ---------- Bloque 7: cuánto de lo gravado en 2024 fue inflación (inmuebles) ----------
+# AEAT, Estadística de declarantes del IRPF 2024, bloque V; Registradores, Anuario ERI 2024 (periodo medio de posesión 17,7 años)
+TENENCIAS = [10, 15, 17.7]
+TIPOS_REF = (0.19, 0.21, 0.23)
+
+def tabla_inflacion_inmuebles():
+    aeat = list(csv.DictReader(open(RAIZ / "data" / "raw" / "aeat_irpf2024_transmisiones_por_activo.csv")))
+    g = lambda a, s, p: int(next(x["importe_eur"] for x in aeat if x["activo"] == a and x["seccion"] == s and x["partida"] == p))
+    adq = g("inmuebles", "Operaciones sin beneficio fiscal", "Valor de Adquisición")
+    gan = g("inmuebles", "Operaciones sin beneficio fiscal", "Resultado positivo")
+    i2024 = media_anual(2024)
+    filas = []
+    for h in TENENCIAS:
+        t = 2024.5 - h                      # ventas repartidas a lo largo de 2024: fecha media de compra
+        anio, mes = int(t), int((t - int(t)) * 12) + 1
+        mes = min(mes, 12)
+        coef = i2024 / IDX[f"{anio}-{mes:02d}"]
+        infl = adq * (coef - 1)
+        filas.append(dict(anios_tenencia=h, mes_compra_medio=f"{anio}-{mes:02d}", coef_ipc=round(coef, 4),
+                          valor_adquisicion=adq, ganancia_gravada=gan, componente_inflacion=round(infl),
+                          ganancia_real=round(gan - infl), pct_inflacion=round(infl / gan, 4),
+                          irpf_sobre_inflacion_19=round(infl * .19), irpf_sobre_inflacion_21=round(infl * .21),
+                          irpf_sobre_inflacion_23=round(infl * .23)))
+    with open(RAIZ / "data" / "processed" / "grafico5_inflacion_plusvalias_inmuebles_2024.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
+    return filas
+
+def grafico_inflacion_inmuebles(filas):
+    fig, ax = plt.subplots(figsize=(12, 6.2), dpi=150)
+    fig.subplots_adjust(left=0.28, right=0.95, top=0.68, bottom=0.2)
+    gan = filas[0]["ganancia_gravada"] / 1e9
+    y = list(range(len(filas)))[::-1]
+    for yi, f in zip(y, filas):
+        inf_ = f["componente_inflacion"] / 1e9; real = f["ganancia_real"] / 1e9
+        ax.barh(yi, inf_, height=0.55, color=NARANJA, zorder=3)
+        ax.barh(yi, real, left=inf_ + 0.06, height=0.55, color=AZUL, zorder=3)
+        ax.text(inf_ / 2, yi, f"Inflación: {es(f['pct_inflacion'] * 100)} %", ha="center", va="center", color="#ffffff",
+                fontsize=12, fontweight="bold")
+        ax.text(gan + 0.25, yi, f"{es(real, 1)} mil M€ reales", ha="left", va="center", color=TINTA2, fontsize=11)
+    etiq = [f"{es(f['anios_tenencia'], 1).rstrip('0').rstrip(',')} años de tenencia" + (" (media oficial)" if f["anios_tenencia"] == 17.7 else "") for f in filas]
+    ax.set_yticks(y, etiq); ax.tick_params(length=0, labelsize=11.5, colors=TINTA2)
+    ax.set_xlim(0, gan * 1.32); ax.set_xticks([])
+    for sp in ax.spines.values(): sp.set_visible(False)
+    c = filas[-1]
+    fig.text(0.04, 0.92, f"El {es(c['pct_inflacion'] * 100)} % de las plusvalías inmobiliarias gravadas en 2024 sería inflación",
+             fontsize=20, fontweight="bold", ha="left")
+    fig.text(0.04, 0.86, f"Ganancias por venta de inmuebles declaradas en el IRPF de 2024 sin exenciones: {es(gan, 1)} mil millones de €. "
+             "\nEn naranja, la parte que solo compensa la subida de precios desde la compra, según los años de tenencia.\n"
+             f"Con la tenencia media oficial, el IRPF cobró unos {es(c['irpf_sobre_inflacion_21'] / 1e9, 1)} mil millones de € sobre esa parte.",
+             fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
+    pie(fig, "Fuente: AEAT, Estadística de los declarantes del IRPF 2024, bloque V (inmuebles, operaciones sin beneficio fiscal); "
+             "Colegio de Registradores, Anuario ERI 2024\n(periodo medio de posesión 17,7 años); INE (IPC). IRPF estimado al 21 % (rango 19-23 %). "
+             f"Cálculo propio. Datos y código: {REPO}")
+    fig.savefig(SALIDA / "05_inflacion_en_plusvalias_inmuebles_2024.png")
+    plt.close(fig)
+
 if __name__ == "__main__":
     v = grafico_poder_adquisitivo()
     filas = tabla_tipo_efectivo()
@@ -278,3 +334,5 @@ if __name__ == "__main__":
     lim = tabla_escala()
     print("Umbrales actualizados:", lim)
     print("Gráfico 4 (actual, escala, base):", [round(v) for v in grafico_medidas(lim, filas)])
+    fi = tabla_inflacion_inmuebles(); grafico_inflacion_inmuebles(fi)
+    for f in fi: print("Gráfico 5:", f)

@@ -1,0 +1,116 @@
+activo,seccion,partida,numero,importe_eur
+total,"","Ganancia neta",9751029,24169358667
+total,"OPERACIONES CON GANANCIAS","Número de operaciones",7106689,
+total,"OPERACIONES CON GANANCIAS","Ganancia a integrar en BIA",6825880,33224427487
+total,"Operaciones con beneficio fiscal","Número de operaciones",231282,
+total,"Operaciones con beneficio fiscal","Valor de Transmisión",231282,22435222103
+total,"Operaciones con beneficio fiscal","Valor de Adquisición",222937,10054060747
+total,"Operaciones con beneficio fiscal","Resultado positivo",231282,12381161356
+total,"Operaciones con beneficio fiscal","Exenciones",100583,5578507185
+total,"Operaciones con beneficio fiscal","Reducciones",132657,2180753110
+total,"Operaciones con beneficio fiscal","Ganancia Patrimonial reducida no exenta",157927,4621901061
+total,"Operaciones con beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",2262,238590272
+total,"Operaciones con beneficio fiscal","Ganancia reducida no exenta imputable a 2024",157784,4383310789
+total,"Operaciones sin beneficio fiscal","Número de operaciones",6875407,
+total,"Operaciones sin beneficio fiscal","Valor de Transmisión",6875202,134668861197
+total,"Operaciones sin beneficio fiscal","Valor de Adquisición",6305786,104299438231
+total,"Operaciones sin beneficio fiscal","Resultado positivo",6669489,30369422965
+total,"Operaciones sin beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",12447,1528306267
+total,"Operaciones sin beneficio fiscal","Ganancia reducida no exenta imputable a 2024",6668096,28841116698
+total,"OPERACIONES CON PÉRDIDAS","Número de operaciones",2644340,
+total,"OPERACIONES CON PÉRDIDAS","Perdida a integrar en BIA",2644340,9055068820
+total,"OPERACIONES CON PÉRDIDAS","Valor de Transmisión",2603418,65780048311
+total,"OPERACIONES CON PÉRDIDAS","Valor de Adquisición",2644340,74877546633
+total,"OPERACIONES CON PÉRDIDAS","Resultado negativo",2644340,9097498321
+total,"OPERACIONES CON PÉRDIDAS","Pérdidas patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",3148,42429501
+total,"OPERACIONES CON PÉRDIDAS","Pérdida imputable a 2024",2644340,9055068820
+inmuebles,"","Ganancia neta",1595163,11150031412
+inmuebles,"OPERACIONES CON GANANCIAS","Número de operaciones",1057617,
+inmuebles,"OPERACIONES CON GANANCIAS","Ganancia a integrar en BIA",873054,16260081446
+inmuebles,"Operaciones con beneficio fiscal","Número de operaciones",219344,
+inmuebles,"Operaciones con beneficio fiscal","Valor de Transmisión",219344,20760689004
+inmuebles,"Operaciones con beneficio fiscal","Importe real de la transmisión",219344,21296582315
+inmuebles,"Operaciones con beneficio fiscal","Gastos y tributos inherentes a la transmisión satisfechos por el transmitente",132397,535893312
+inmuebles,"Operaciones con beneficio fiscal","Valor de Adquisición",213197,9928748754
+inmuebles,"Operaciones con beneficio fiscal","Importe real de adquisición",214260,9530191680
+inmuebles,"Operaciones con beneficio fiscal","Gastos y tributos inherentes a la adquisición satisfechos por el adquiriente",101939,467421460
+inmuebles,"Operaciones con beneficio fiscal","Amortizaciones",28751,68864386
+inmuebles,"Operaciones con beneficio fiscal","Resultado positivo",219344,10831940249
+inmuebles,"Operaciones con beneficio fiscal","Exenciones",99414,5494986796
+inmuebles,"Operaciones con beneficio fiscal","Reducciones",121793,1930575298
+inmuebles,"Operaciones con beneficio fiscal","Ganancia Patrimonial reducida no exenta",147681,3406378156
+inmuebles,"Operaciones con beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",1372,82578993
+inmuebles,"Operaciones con beneficio fiscal","Ganancia reducida no exenta imputable a 2024",147590,3323799162
+inmuebles,"Operaciones sin beneficio fiscal","Número de operaciones",838273,
+inmuebles,"Operaciones sin beneficio fiscal","Valor de Transmisión",838249,40578234314
+inmuebles,"Operaciones sin beneficio fiscal","Importe real de la transmisión",838249,41517786111
+inmuebles,"Operaciones sin beneficio fiscal","Gastos y tributos inherentes a la transmisión satisfechos por el transmitente",372962,939551797
+inmuebles,"Operaciones sin beneficio fiscal","Valor de Adquisición",816176,27400239267
+inmuebles,"Operaciones sin beneficio fiscal","Importe real de adquisición",815974,26947739776
+inmuebles,"Operaciones sin beneficio fiscal","Gastos y tributos inherentes a la adquisición satisfechos por el adquiriente",339368,1221377074
+inmuebles,"Operaciones sin beneficio fiscal","Amortizaciones",145262,768877583
+inmuebles,"Operaciones sin beneficio fiscal","Resultado positivo",726011,13177995047
+inmuebles,"Operaciones sin beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",5982,241712764
+inmuebles,"Operaciones sin beneficio fiscal","Ganancia reducida no exenta imputable a 2024",725464,12936282283
+inmuebles,"OPERACIONES CON PÉRDIDAS","Número de operaciones",537546,
+inmuebles,"OPERACIONES CON PÉRDIDAS","Perdida a integrar en BIA",537546,5110050034
+inmuebles,"OPERACIONES CON PÉRDIDAS","Valor de Transmisión",536354,19600448268
+inmuebles,"OPERACIONES CON PÉRDIDAS","Importe real de la transmisión",536354,19974157607
+inmuebles,"OPERACIONES CON PÉRDIDAS","Gastos y tributos inherentes a la transmisión satisfechos por el transmitente",201943,373709339
+inmuebles,"OPERACIONES CON PÉRDIDAS","Valor de Adquisición",537546,24726722048
+inmuebles,"OPERACIONES CON PÉRDIDAS","Importe real de adquisición",537332,24170947597
+inmuebles,"OPERACIONES CON PÉRDIDAS","Gastos y tributos inherentes a la adquisición satisfechos por el adquiriente",208144,763762356
+inmuebles,"OPERACIONES CON PÉRDIDAS","Amortizaciones",44049,207987905
+inmuebles,"OPERACIONES CON PÉRDIDAS","Resultado negativo",537546,5126273780
+inmuebles,"OPERACIONES CON PÉRDIDAS","Pérdidas patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",2116,16223746
+inmuebles,"OPERACIONES CON PÉRDIDAS","Pérdida imputable a 2024",537546,5110050034
+valores,"","Ganancia neta",7988930,11236158800
+valores,"OPERACIONES CON GANANCIAS","Número de operaciones",5929154,
+valores,"OPERACIONES CON GANANCIAS","Ganancia a integrar en BIA",5842482,14807019221
+valores,"Operaciones con beneficio fiscal","Número de operaciones",8805,
+valores,"Operaciones con beneficio fiscal","Valor de Transmisión",8805,1260130829
+valores,"Operaciones con beneficio fiscal","Valor de Adquisición",8028,100484698
+valores,"Operaciones con beneficio fiscal","Resultado positivo",8805,1159646130
+valores,"Operaciones con beneficio fiscal","Exenciones",1024,59235278
+valores,"Operaciones con beneficio fiscal","Reducciones",7860,141915625
+valores,"Operaciones con beneficio fiscal","Ganancia Patrimonial reducida no exenta",7133,958495227
+valores,"Operaciones con beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",752,140415891
+valores,"Operaciones con beneficio fiscal","Ganancia reducida no exenta imputable a 2024",7090,818079336
+valores,"Operaciones sin beneficio fiscal","Número de operaciones",5920349,
+valores,"Operaciones sin beneficio fiscal","Valor de Transmisión",5920222,88573856416
+valores,"Operaciones sin beneficio fiscal","Valor de Adquisición",5407695,73647669997
+valores,"Operaciones sin beneficio fiscal","Resultado positivo",5836005,14926186419
+valores,"Operaciones sin beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",4786,937246534
+valores,"Operaciones sin beneficio fiscal","Ganancia reducida no exenta imputable a 2024",5835392,13988939885
+valores,"OPERACIONES CON PÉRDIDAS","Número de operaciones",2059776,
+valores,"OPERACIONES CON PÉRDIDAS","Perdida a integrar en BIA",2059776,3570860421
+valores,"OPERACIONES CON PÉRDIDAS","Valor de Transmisión",2026014,38637302452
+valores,"OPERACIONES CON PÉRDIDAS","Valor de Adquisición",2059776,42230283473
+valores,"OPERACIONES CON PÉRDIDAS","Resultado negativo",2059776,3592981021
+valores,"OPERACIONES CON PÉRDIDAS","Pérdidas patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",831,22120600
+valores,"OPERACIONES CON PÉRDIDAS","Pérdida imputable a 2024",2059776,3570860421
+resto,"","Ganancia neta",166936,1783168455
+resto,"OPERACIONES CON GANANCIAS","Número de operaciones",119918,
+resto,"OPERACIONES CON GANANCIAS","Ganancia a integrar en BIA",110344,2157326820
+resto,"Operaciones con beneficio fiscal","Número de operaciones",3133,
+resto,"Operaciones con beneficio fiscal","Valor de Transmisión",3133,414402271
+resto,"Operaciones con beneficio fiscal","Valor de Adquisición",1712,24827295
+resto,"Operaciones con beneficio fiscal","Resultado positivo",3133,389574976
+resto,"Operaciones con beneficio fiscal","Exenciones",145,24285110
+resto,"Operaciones con beneficio fiscal","Reducciones",3004,108262188
+resto,"Operaciones con beneficio fiscal","Ganancia Patrimonial reducida no exenta",3113,257027678
+resto,"Operaciones con beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",138,15595387
+resto,"Operaciones con beneficio fiscal","Ganancia reducida no exenta imputable a 2024",3104,241432291
+resto,"Operaciones sin beneficio fiscal","Número de operaciones",116785,
+resto,"Operaciones sin beneficio fiscal","Valor de Transmisión",116731,5516770466
+resto,"Operaciones sin beneficio fiscal","Valor de Adquisición",81915,3251528968
+resto,"Operaciones sin beneficio fiscal","Resultado positivo",107473,2265241499
+resto,"Operaciones sin beneficio fiscal","Ganancias patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",1679,349346969
+resto,"Operaciones sin beneficio fiscal","Ganancia reducida no exenta imputable a 2024",107240,1915894530
+resto,"OPERACIONES CON PÉRDIDAS","Número de operaciones",47018,
+resto,"OPERACIONES CON PÉRDIDAS","Perdida a integrar en BIA",47018,374158365
+resto,"OPERACIONES CON PÉRDIDAS","Valor de Transmisión",41050,7542297591
+resto,"OPERACIONES CON PÉRDIDAS","Valor de Adquisición",47018,7920541112
+resto,"OPERACIONES CON PÉRDIDAS","Resultado negativo",47018,378243521
+resto,"OPERACIONES CON PÉRDIDAS","Pérdidas patrimoniales con criterios especiales de imputación temporal (art.14.2.c),g), i), j) y k) Ley IRPF)",201,4085155
+resto,"OPERACIONES CON PÉRDIDAS","Pérdida imputable a 2024",47018,374158365
