@@ -19,8 +19,9 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 
 ```
 data/raw/         Datos tal como los publica la fuente, sin modificar
-data/processed/   Tablas derivadas (Excel con fórmulas visibles)
-scripts/          Scripts de descarga y cálculo
+data/processed/   Tablas derivadas (Excel con fórmulas y tablas de cada gráfico)
+graficos/         Gráficos del artículo (PNG)
+scripts/          Scripts de descarga, cálculo y gráficos
 ```
 
 ## Cómo reproducirlo
@@ -30,7 +31,10 @@ Requisitos: Python 3.10 o superior y `openpyxl`.
 ```bash
 python scripts/descargar_ipc.py        # descarga el IPC desde la API del INE
 python scripts/construir_hoja_ipc.py   # genera data/processed/IPC_Espana_base_INE.xlsx
+python scripts/graficos.py             # genera graficos/ y sus tablas en data/processed/
 ```
+
+Requiere además `matplotlib` y `numpy` para los gráficos.
 
 Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la hoja, el texto azul es dato de la fuente y el negro es fórmula.
 
@@ -38,6 +42,22 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 
 - La suma de los 297 índices mensuales (enero 2002 – septiembre 2026) es 23.424,447, idéntica a la que devuelve la API del INE.
 - Las 285 tasas interanuales recalculadas a partir del índice coinciden con las publicadas por el INE (serie IPC290750), con una tolerancia de 0,1 puntos por el redondeo de la publicación.
+
+## Gráficos
+
+| Gráfico | Qué muestra | Tabla de datos |
+| --- | --- | --- |
+| `01_poder_adquisitivo_1000eur.png` | Valor real hoy de 1.000 € guardados sin invertir desde enero de 2002 | `grafico1_poder_adquisitivo_1000eur.csv` |
+| `02_tipo_efectivo_ganancia_real.png` | Cuota del IRPF dividida entre la ganancia real, por año de compra y rentabilidad real anual | `grafico2_tipo_efectivo_real.csv` |
+
+### Supuestos del gráfico 2
+
+- Bien comprado por 150.000 € a mitad del año indicado y vendido en el último mes con IPC definitivo.
+- Precio de venta = precio de compra × coeficiente IPC × (1 + rentabilidad real anual) ^ años de tenencia.
+- Coeficiente IPC = índice del último mes / índice medio del año de compra.
+- Cuota = escala del ahorro del IRPF 2026 (19 %, 21 %, 23 %, 27 % y 30 %; tramos de 6.000, 50.000, 200.000 y 300.000 €) aplicada a la ganancia nominal.
+- Tipo efectivo real = cuota / (precio de venta − precio de compra × coeficiente IPC).
+- Sin gastos de compraventa, exenciones (vivienda habitual de mayores de 65, reinversión), reducciones ni compensación con pérdidas.
 
 ## Notas de metodología
 
