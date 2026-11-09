@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuánto de tu plusvalía es inflación?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Plan: una liquidación de IRPF en limpio. A la izquierda los datos de la operación, a la derecha el resultado;
+   la ganancia se dibuja como una barra partida entre inflación (rayada, naranja) y ganancia real (azul). */
+:root {
+  --paper: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #101a2b;
+  --muted: #586274;
+  --rule: #d8dde5;
+  --real: #2a78d6;
+  --infl: #e2622c;
+  --infl-soft: #fbe3d8;
+  --focus: #2a78d6;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1219; --surface: #151c26; --ink: #e9edf3; --muted: #9ba5b4; --rule: #2a3442;
+    --real: #5f9ee8; --infl: #f08356; --infl-soft: #3a2219; --focus: #8bb9ef; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1219; --surface: #151c26; --ink: #e9edf3; --muted: #9ba5b4; --rule: #2a3442;
+  --real: #5f9ee8; --infl: #f08356; --infl-soft: #3a2219; --focus: #8bb9ef; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 48px; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; max-width: 760px; }
+.kicker { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--infl); }
+h1 { font: 700 clamp(30px, 5vw, 46px)/1.05 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.lede { margin: 0; color: var(--muted); font-size: 17px; max-width: 64ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: grid; gap: 18px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
+legend { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 0 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input, select { font: 500 16px/1.2 var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 10px; width: 100%; font-variant-numeric: tabular-nums; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.eur { position: relative; }
+.eur input { padding-right: 28px; }
+.eur::after { content: "€"; position: absolute; right: 10px; bottom: 10px; color: var(--muted); font: 500 16px/1.2 var(--mono); pointer-events: none; }
+.hint { font-size: 12px; color: var(--muted); margin: 0; }
+.err { font-size: 13px; color: var(--infl); margin: 0; min-height: 0; }
+.result { display: grid; gap: 22px; }
+.verdict { font: 600 clamp(22px, 3.2vw, 30px)/1.2 var(--display); margin: 0; text-wrap: balance; }
+.verdict .n-infl { color: var(--infl); }
+.verdict .n-real { color: var(--real); }
+.bar-block { display: grid; gap: 8px; }
+.bar-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.bar { display: flex; height: 44px; border-radius: 6px; overflow: hidden; background: var(--paper); border: 1px solid var(--rule); gap: 2px; }
+.seg { height: 100%; transition: width .35s ease; min-width: 0; }
+.seg.infl { background: repeating-linear-gradient(135deg, var(--infl) 0 7px, color-mix(in srgb, var(--infl) 78%, var(--surface)) 7px 11px); }
+.seg.real { background: var(--real); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.ledger { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ledger td { padding: 9px 0; border-bottom: 1px solid var(--rule); vertical-align: baseline; }
+.ledger td:last-child { text-align: right; font: 500 16px/1.3 var(--mono); white-space: nowrap; padding-left: 16px; }
+.ledger tr.total td { border-bottom: 2px solid var(--ink); font-weight: 600; }
+.ledger tr.total td:last-child { font-weight: 600; }
+.ledger .sub { display: block; font-size: 12px; color: var(--muted); }
+.taxes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .taxes { grid-template-columns: 1fr; } }
+.tax { border: 1px solid var(--rule); border-radius: 8px; padding: 14px; display: grid; gap: 4px; }
+.tax.now { border-color: var(--infl); background: var(--infl-soft); }
+.tax h3 { margin: 0; font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tax .big { font: 600 28px/1.1 var(--mono); }
+.tax p { margin: 0; font-size: 13px; color: var(--muted); }
+.stamp { display: inline-flex; align-items: center; gap: 8px; align-self: start; justify-self: start; border: 2px solid var(--infl); color: var(--infl); border-radius: 6px; padding: 6px 10px; font: 600 13px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; transform: rotate(-1.5deg); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+button { font: 600 14px/1 var(--body); color: var(--surface); background: var(--ink); border: 0; border-radius: 6px; padding: 11px 14px; cursor: pointer; }
+button.ghost { color: var(--ink); background: transparent; border: 1px solid var(--rule); }
+.copied { font-size: 13px; color: var(--muted); }
+.notes { display: grid; gap: 10px; max-width: 760px; font-size: 14px; color: var(--muted); }
+.notes h2 { margin: 0; font: 700 20px/1.2 var(--display); color: var(--ink); }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.notes a { color: var(--real); }
+.scale { font: 13px/1.6 var(--mono); }
+@media (prefers-reduced-motion: reduce) { .seg { transition: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <span class="kicker">IRPF · ganancias patrimoniales · escala del ahorro 2026</span>
+    <h1>¿Cuánto de tu plusvalía es inflación?</h1>
+    <p class="lede">Al vender una vivienda, Hacienda calcula la ganancia restando el precio de compra al de venta, sin descontar la subida de precios. Introduce tu operación y verás qué parte de lo que «ganas» solo compensa la inflación y cuánto IRPF pagas por ella.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="f" novalidate>
+      <fieldset>
+        <legend>Compra</legend>
+        <div class="row">
+          <label for="cm">Mes<select id="cm"></select></label>
+          <label for="ca">Año<select id="ca"></select></label>
+        </div>
+        <label for="cp" class="eur">Precio de compra<input id="cp" inputmode="numeric" autocomplete="off"></label>
+        <label for="cg" class="eur">Gastos e impuestos de la compra<input id="cg" inputmode="numeric" autocomplete="off"></label>
+        <p class="hint">Notaría, registro, gestoría e ITP o IVA. Forman parte del valor de adquisición.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Venta</legend>
+        <div class="row">
+          <label for="vm">Mes<select id="vm"></select></label>
+          <label for="va">Año<select id="va"></select></label>
+        </div>
+        <label for="vp" class="eur">Precio de venta<input id="vp" inputmode="numeric" autocomplete="off"></label>
+        <label for="vg" class="eur">Gastos de la venta<input id="vg" inputmode="numeric" autocomplete="off"></label>
+        <p class="hint">Inmobiliaria, plusvalía municipal y otros gastos que paga el vendedor. Se restan del precio de venta.</p>
+      </fieldset>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+
+    <section class="panel result" aria-live="polite">
+      <p class="verdict" id="verdict"></p>
+
+      <div class="bar-block">
+        <div class="bar-label"><span id="barTitle"></span><span id="barPct"></span></div>
+        <div class="bar" role="img" id="bar" aria-label=""><div class="seg infl" id="segI"></div><div class="seg real" id="segR"></div></div>
+        <div class="legend"><span style="--c: var(--infl)">Inflación: no es ganancia</span><span style="--c: var(--real)">Ganancia real</span></div>
+      </div>
+
+      <div class="taxes">
+        <div class="tax now"><h3>IRPF con la ley actual</h3><div class="big" id="tNow"></div><p id="tNowSub"></p></div>
+        <div class="tax"><h3>Si se descontara la inflación</h3><div class="big" id="tReal"></div><p id="tRealSub"></p></div>
+      </div>
+      <span class="stamp" id="stamp"></span>
+
+      <table class="ledger" aria-label="Detalle del cálculo">
+        <tbody id="ledger"></tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" id="copy">Copiar mi resultado</button>
+        <button type="button" class="ghost" id="reset">Volver al ejemplo</button>
+        <span class="copied" id="copied" aria-live="polite"></span>
+      </div>
+    </section>
+  </div>
+
+  <section class="notes">
+    <h2>Cómo se calcula</h2>
+    <ul>
+      <li><strong>Ganancia que ve Hacienda:</strong> (precio de venta − gastos de venta) − (precio de compra + gastos de compra), sin ningún ajuste por inflación desde 2015 (art. 35 de la Ley del IRPF tras la Ley 26/2014).</li>
+      <li><strong>Parte que es inflación:</strong> lo que tendría que valer hoy tu compra solo para conservar su poder adquisitivo, según el IPC del INE del mes de compra y del mes de venta.</li>
+      <li><strong>IRPF:</strong> escala del ahorro de 2026 (19 % hasta 6.000 €, 21 % hasta 50.000 €, 23 % hasta 200.000 €, 27 % hasta 300.000 € y 30 % por encima), suponiendo que esta ganancia es lo único que tienes en la base del ahorro ese año.</li>
+      <li class="scale" id="ipcInfo"></li>
+    </ul>
+    <h2>Lo que no tiene en cuenta</h2>
+    <ul>
+      <li>Exenciones: venta de la vivienda habitual por mayores de 65 años o reinversión en otra vivienda habitual. Si te aplica alguna, puedes no tributar.</li>
+      <li>Compras anteriores a 1995: pueden aplicar coeficientes de abatimiento (disposición transitoria 9.ª), que reducen la ganancia. Antes de 2002 el IPC es aproximado.</li>
+      <li>Otras rentas del ahorro, pérdidas que compensar, herencias (el valor de adquisición es el declarado en el impuesto de sucesiones) y el régimen foral del País Vasco y Navarra.</li>
+      <li>Es una simulación divulgativa, no un cálculo de tu declaración ni asesoramiento fiscal.</li>
+    </ul>
+    <p>Datos: INE, IPC índice general nacional (serie IPC290751, base 2025) y variación mensual (IPC290752); escala de los arts. 66 y 76 de la Ley 35/2006 (BOE). Código y metodología: <a href="https://github.com/lpibarrondo-jpg/plusvalias-inflacion-datos">github.com/lpibarrondo-jpg/plusvalias-inflacion-datos</a>.</p>
+  </section>
+</main>
+
+<script>
+const IPC = __IPC__;            // { "AAAA-MM": índice base 2025 }
+const EXACTO_DESDE = "2002-01"; // antes, encadenado con variaciones mensuales redondeadas
+const ULTIMO = __ULTIMO__;
+const ESCALA = [[6000, .19], [50000, .21], [200000, .23], [300000, .27], [Infinity, .30]];
+const EJEMPLO = { cm: 6, ca: 2015, cp: 150000, cg: 10000, vm: +ULTIMO.slice(5), va: +ULTIMO.slice(0, 4), vp: 250000, vg: 7500 };
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function eur(x, dec = 0) {
+  const neg = x < 0, a = Math.abs(x);
+  const [ent, fr] = a.toFixed(dec).split(".");
+  const conPuntos = ent.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return (neg ? "−" : "") + conPuntos + (fr ? "," + fr : "") + " €";
+}
+function pct(x, dec = 0) { return (x * 100).toFixed(dec).replace(".", ",") + " %"; }
+function num(s) { const n = Number(String(s).replace(/\./g, "").replace(/\s|€/g, "").replace(",", ".")); return isFinite(n) ? n : NaN; }
+
+function cuota(base) {
+  let c = 0, prev = 0;
+  for (const [lim, t] of ESCALA) { if (base <= prev) break; c += (Math.min(base, lim) - prev) * t; prev = lim; }
+  return c;
+}
+
+function calcular(d) {
+  const kC = `${d.ca}-${String(d.cm).padStart(2, "0")}`, kV = `${d.va}-${String(d.vm).padStart(2, "0")}`;
+  const iC = IPC[kC], iV = IPC[kV];
+  const adq = d.cp + d.cg, trans = d.vp - d.vg;
+  const coef = iV / iC;
+  const adqAct = adq * coef;
+  const gNom = trans - adq;
+  const gReal = trans - adqAct;
+  const infl = adqAct - adq;
+  const tNow = gNom > 0 ? cuota(gNom) : 0;
+  const tReal = gReal > 0 ? cuota(gReal) : 0;
+  return { kC, kV, coef, adq, trans, adqAct, gNom, gReal, infl, tNow, tReal,
+           aprox: kC < EXACTO_DESDE };
+}
+
+const $ = id => document.getElementById(id);
+function opciones() {
+  const anios = [...new Set(Object.keys(IPC).map(k => +k.slice(0, 4)))];
+  for (const id of ["cm", "vm"]) $(id).innerHTML = MESES.map((m, i) => `<option value="${i + 1}">${m}</option>`).join("");
+  $("ca").innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join("");
+  $("va").innerHTML = anios.filter(a => a >= 2002).map(a => `<option value="${a}">${a}</option>`).join("");
+}
+function fijar(d) {
+  for (const k of ["cm", "ca", "vm", "va"]) $(k).value = d[k];
+  for (const k of ["cp", "cg", "vp", "vg"]) $(k).value = eur(d[k]).replace(" €", "");
+}
+function leer() {
+  return { cm: +$("cm").value, ca: +$("ca").value, cp: num($("cp").value), cg: num($("cg").value || 0),
+           vm: +$("vm").value, va: +$("va").value, vp: num($("vp").value), vg: num($("vg").value || 0) };
+}
+function fechaTxt(k) { return MESES[+k.slice(5) - 1] + " de " + k.slice(0, 4); }
+
+let ultimoTexto = "";
+function pintar() {
+  const d = leer();
+  const kC = `${d.ca}-${String(d.cm).padStart(2, "0")}`, kV = `${d.va}-${String(d.vm).padStart(2, "0")}`;
+  let error = "";
+  if (!(d.cp > 0) || !(d.vp > 0)) error = "Escribe el precio de compra y el de venta en euros, por ejemplo 180.000.";
+  else if (isNaN(d.cg) || isNaN(d.vg) || d.cg < 0 || d.vg < 0) error = "Los gastos deben ser una cantidad en euros, o 0.";
+  else if (!(kC in IPC)) error = "No hay IPC para esa fecha de compra. Elige una fecha anterior.";
+  else if (!(kV in IPC)) error = `El último IPC publicado es el de ${fechaTxt(ULTIMO)}. Elige una fecha de venta hasta ese mes.`;
+  else if (kV < kC) error = "La venta tiene que ser posterior a la compra.";
+  $("err").textContent = error;
+  if (error) return;
+
+  const r = calcular(d);
+  const subida = r.coef - 1;
+  const parteInfl = r.gNom > 0 ? Math.min(1, Math.max(0, r.infl / r.gNom)) : 0;
+
+  // Veredicto
+  let v;
+  if (r.gNom <= 0) {
+    v = `Vendes sin ganancia nominal: no pagas IRPF. Descontando la inflación, pierdes <span class="n-infl">${eur(-r.gReal)}</span> de poder adquisitivo.`;
+  } else if (r.gReal <= 0) {
+    v = `Hacienda ve ${eur(r.gNom)} de ganancia, pero toda es inflación: en términos reales pierdes ${eur(-r.gReal)} y aun así pagas <span class="n-infl">${eur(r.tNow)}</span> de IRPF.`;
+  } else {
+    v = `De tus ${eur(r.gNom)} de ganancia, <span class="n-infl">${eur(Math.min(r.infl, r.gNom))}</span> son inflación (${pct(parteInfl)}). Lo que de verdad ganas son <span class="n-real">${eur(r.gReal)}</span>.`;
+  }
+  $("verdict").innerHTML = v;
+
+  // Barra
+  const total = Math.max(r.gNom, 0);
+  const wI = total > 0 ? Math.min(r.infl, total) / total * 100 : 0;
+  $("segI").style.width = wI + "%";
+  $("segR").style.width = (total > 0 ? 100 - wI : 0) + "%";
+  $("barTitle").textContent = total > 0 ? `Ganancia que ve Hacienda: ${eur(total)}` : "Sin ganancia nominal";
+  $("barPct").textContent = total > 0 ? `${pct(parteInfl)} es inflación` : "";
+  $("bar").setAttribute("aria-label", total > 0 ? `De ${eur(total)} de ganancia, ${pct(parteInfl)} es inflación` : "Sin ganancia");
+
+  // Impuestos
+  $("tNow").textContent = eur(r.tNow);
+  $("tNowSub").textContent = r.gNom > 0 ? `Sobre ${eur(r.gNom)} de ganancia nominal (${pct(r.tNow / r.gNom, 1)}).` : "No hay ganancia que gravar.";
+  $("tReal").textContent = eur(r.tReal);
+  $("tRealSub").textContent = r.gReal > 0 ? `Sobre ${eur(r.gReal)} de ganancia real (${pct(r.tReal / r.gReal, 1)}).` : "No hay ganancia real que gravar.";
+  const extra = r.tNow - r.tReal;
+  let sello;
+  if (r.gNom <= 0) sello = "Sin IRPF por esta venta";
+  else if (r.gReal <= 0) sello = `Pagas ${eur(r.tNow)} sin ganar nada en términos reales`;
+  else sello = `${eur(extra)} de IRPF por inflación · tipo real del ${pct(r.tNow / r.gReal, 1)}`;
+  $("stamp").textContent = sello;
+
+  // Desglose
+  const filas = [
+    ["Valor de adquisición", "Precio de compra + gastos", eur(r.adq)],
+    ["Valor de transmisión", "Precio de venta − gastos", eur(r.trans)],
+    ["Subida de precios entre compra y venta", `IPC de ${fechaTxt(r.kC)} a ${fechaTxt(r.kV)} · ×${r.coef.toFixed(4).replace(".", ",")}`, pct(subida, 1)],
+    ["Tu compra en euros de hoy", "Lo que tendría que valer para no perder poder adquisitivo", eur(r.adqAct)],
+    ["Ganancia que ve Hacienda", "Transmisión − adquisición", eur(r.gNom)],
+    ["Parte que es inflación", "Compra en euros de hoy − compra", eur(r.infl)],
+    ["Ganancia real", "Transmisión − compra en euros de hoy", eur(r.gReal)],
+  ];
+  $("ledger").innerHTML = filas.map(([a, b, c], i) =>
+    `<tr${i === 6 ? ' class="total"' : ""}><td>${a}<span class="sub">${b}</span></td><td>${c}</td></tr>`).join("");
+
+  let avisos = `IPC de compra (${fechaTxt(r.kC)}): ${IPC[r.kC].toFixed(3).replace(".", ",")} · IPC de venta (${fechaTxt(r.kV)}): ${IPC[r.kV].toFixed(3).replace(".", ",")} · base 2025.`;
+  if (r.aprox) avisos += " Antes de 2002 el índice se reconstruye con las variaciones mensuales oficiales redondeadas: el resultado es aproximado.";
+  if (d.ca < 1995) avisos += " Compra anterior a 1995: podrían aplicarse coeficientes de abatimiento que reducen la ganancia; esta calculadora no los aplica.";
+  $("ipcInfo").textContent = avisos;
+
+  ultimoTexto = r.gNom > 0
+    ? `Compré en ${fechaTxt(r.kC)} por ${eur(r.adq)} y vendo en ${fechaTxt(r.kV)} por ${eur(r.trans)}. Hacienda ve ${eur(r.gNom)} de ganancia, pero ${eur(Math.min(r.infl, r.gNom))} (${pct(parteInfl)}) son solo inflación. IRPF: ${eur(r.tNow)}; descontando la inflación serían ${eur(r.tReal)}.`
+    : `Compré en ${fechaTxt(r.kC)} por ${eur(r.adq)} y vendo en ${fechaTxt(r.kV)} por ${eur(r.trans)}: sin ganancia nominal, y con la inflación pierdo ${eur(-r.gReal)} de poder adquisitivo.`;
+}
+
+opciones();
+fijar(EJEMPLO);
+for (const id of ["cm", "ca", "cp", "cg", "vm", "va", "vp", "vg"]) $(id).addEventListener("input", pintar);
+for (const id of ["cp", "cg", "vp", "vg"]) $(id).addEventListener("blur", e => { const n = num(e.target.value); if (isFinite(n) && e.target.value !== "") e.target.value = eur(n).replace(" €", ""); });
+$("f").addEventListener("submit", e => e.preventDefault());
+$("reset").addEventListener("click", () => { fijar(EJEMPLO); pintar(); });
+$("copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(ultimoTexto + " Calcúlalo tú: " + location.href); $("copied").textContent = "Copiado."; }
+  catch { $("copied").textContent = "Tu navegador no permite copiar desde aquí."; }
+});
+pintar();
+</script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuánto de tu plusvalía es inflación?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Plan: una liquidación de IRPF en limpio. A la izquierda los datos de la operación, a la derecha el resultado;
+   la ganancia se dibuja como una barra partida entre inflación (rayada, naranja) y ganancia real (azul). */
+:root {
+  --paper: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #101a2b;
+  --muted: #586274;
+  --rule: #d8dde5;
+  --real: #2a78d6;
+  --infl: #e2622c;
+  --infl-soft: #fbe3d8;
+  --focus: #2a78d6;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1219; --surface: #151c26; --ink: #e9edf3; --muted: #9ba5b4; --rule: #2a3442;
+    --real: #5f9ee8; --infl: #f08356; --infl-soft: #3a2219; --focus: #8bb9ef; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1219; --surface: #151c26; --ink: #e9edf3; --muted: #9ba5b4; --rule: #2a3442;
+  --real: #5f9ee8; --infl: #f08356; --infl-soft: #3a2219; --focus: #8bb9ef; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 48px; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; max-width: 760px; }
+.kicker { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--infl); }
+h1 { font: 700 clamp(30px, 5vw, 46px)/1.05 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.lede { margin: 0; color: var(--muted); font-size: 17px; max-width: 64ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: grid; gap: 18px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
+legend { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 0 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input, select { font: 500 16px/1.2 var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 10px; width: 100%; font-variant-numeric: tabular-nums; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.eur { position: relative; }
+.eur input { padding-right: 28px; }
+.eur::after { content: "€"; position: absolute; right: 10px; bottom: 10px; color: var(--muted); font: 500 16px/1.2 var(--mono); pointer-events: none; }
+.hint { font-size: 12px; color: var(--muted); margin: 0; }
+.err { font-size: 13px; color: var(--infl); margin: 0; min-height: 0; }
+.result { display: grid; gap: 22px; }
+.verdict { font: 600 clamp(22px, 3.2vw, 30px)/1.2 var(--display); margin: 0; text-wrap: balance; }
+.verdict .n-infl { color: var(--infl); }
+.verdict .n-real { color: var(--real); }
+.bar-block { display: grid; gap: 8px; }
+.bar-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.bar { display: flex; height: 44px; border-radius: 6px; overflow: hidden; background: var(--paper); border: 1px solid var(--rule); gap: 2px; }
+.seg { height: 100%; transition: width .35s ease; min-width: 0; }
+.seg.infl { background: repeating-linear-gradient(135deg, var(--infl) 0 7px, color-mix(in srgb, var(--infl) 78%, var(--surface)) 7px 11px); }
+.seg.real { background: var(--real); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.ledger { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ledger td { padding: 9px 0; border-bottom: 1px solid var(--rule); vertical-align: baseline; }
+.ledger td:last-child { text-align: right; font: 500 16px/1.3 var(--mono); white-space: nowrap; padding-left: 16px; }
+.ledger tr.total td { border-bottom: 2px solid var(--ink); font-weight: 600; }
+.ledger tr.total td:last-child { font-weight: 600; }
+.ledger .sub { display: block; font-size: 12px; color: var(--muted); }
+.taxes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .taxes { grid-template-columns: 1fr; } }
+.tax { border: 1px solid var(--rule); border-radius: 8px; padding: 14px; display: grid; gap: 4px; }
+.tax.now { border-color: var(--infl); background: var(--infl-soft); }
+.tax h3 { margin: 0; font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tax .big { font: 600 28px/1.1 var(--mono); }
+.tax p { margin: 0; font-size: 13px; color: var(--muted); }
+.stamp { display: inline-flex; align-items: center; gap: 8px; align-self: start; justify-self: start; border: 2px solid var(--infl); color: var(--infl); border-radius: 6px; padding: 6px 10px; font: 600 13px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; transform: rotate(-1.5deg); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+button { font: 600 14px/1 var(--body); color: var(--surface); background: var(--ink); border: 0; border-radius: 6px; padding: 11px 14px; cursor: pointer; }
+button.ghost { color: var(--ink); background: transparent; border: 1px solid var(--rule); }
+.copied { font-size: 13px; color: var(--muted); }
+.notes { display: grid; gap: 10px; max-width: 760px; font-size: 14px; color: var(--muted); }
+.notes h2 { margin: 0; font: 700 20px/1.2 var(--display); color: var(--ink); }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.notes a { color: var(--real); }
+.scale { font: 13px/1.6 var(--mono); }
+@media (prefers-reduced-motion: reduce) { .seg { transition: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <span class="kicker">IRPF · ganancias patrimoniales · escala del ahorro 2026</span>
+    <h1>¿Cuánto de tu plusvalía es inflación?</h1>
+    <p class="lede">Al vender una vivienda, Hacienda calcula la ganancia restando el precio de compra al de venta, sin descontar la subida de precios. Introduce tu operación y verás qué parte de lo que «ganas» solo compensa la inflación y cuánto IRPF pagas por ella.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="f" novalidate>
+      <fieldset>
+        <legend>Compra</legend>
+        <div class="row">
+          <label for="cm">Mes<select id="cm"></select></label>
+          <label for="ca">Año<select id="ca"></select></label>
+        </div>
+        <label for="cp" class="eur">Precio de compra<input id="cp" inputmode="numeric" autocomplete="off"></label>
+        <label for="cg" class="eur">Gastos e impuestos de la compra<input id="cg" inputmode="numeric" autocomplete="off"></label>
+        <p class="hint">Notaría, registro, gestoría e ITP o IVA. Forman parte del valor de adquisición.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Venta</legend>
+        <div class="row">
+          <label for="vm">Mes<select id="vm"></select></label>
+          <label for="va">Año<select id="va"></select></label>
+        </div>
+        <label for="vp" class="eur">Precio de venta<input id="vp" inputmode="numeric" autocomplete="off"></label>
+        <label for="vg" class="eur">Gastos de la venta<input id="vg" inputmode="numeric" autocomplete="off"></label>
+        <p class="hint">Inmobiliaria, plusvalía municipal y otros gastos que paga el vendedor. Se restan del precio de venta.</p>
+      </fieldset>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+
+    <section class="panel result" aria-live="polite">
+      <p class="verdict" id="verdict"></p>
+
+      <div class="bar-block">
+        <div class="bar-label"><span id="barTitle"></span><span id="barPct"></span></div>
+        <div class="bar" role="img" id="bar" aria-label=""><div class="seg infl" id="segI"></div><div class="seg real" id="segR"></div></div>
+        <div class="legend"><span style="--c: var(--infl)">Inflación: no es ganancia</span><span style="--c: var(--real)">Ganancia real</span></div>
+      </div>
+
+      <div class="taxes">
+        <div class="tax now"><h3>IRPF con la ley actual</h3><div class="big" id="tNow"></div><p id="tNowSub"></p></div>
+        <div class="tax"><h3>Si se descontara la inflación</h3><div class="big" id="tReal"></div><p id="tRealSub"></p></div>
+      </div>
+      <span class="stamp" id="stamp"></span>
+
+      <table class="ledger" aria-label="Detalle del cálculo">
+        <tbody id="ledger"></tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" id="copy">Copiar mi resultado</button>
+        <button type="button" class="ghost" id="reset">Volver al ejemplo</button>
+        <span class="copied" id="copied" aria-live="polite"></span>
+      </div>
+    </section>
+  </div>
+
+  <section class="notes">
+    <h2>Cómo se calcula</h2>
+    <ul>
+      <li><strong>Ganancia que ve Hacienda:</strong> (precio de venta − gastos de venta) − (precio de compra + gastos de compra), sin ningún ajuste por inflación desde 2015 (art. 35 de la Ley del IRPF tras la Ley 26/2014).</li>
+      <li><strong>Parte que es inflación:</strong> lo que tendría que valer hoy tu compra solo para conservar su poder adquisitivo, según el IPC del INE del mes de compra y del mes de venta.</li>
+      <li><strong>IRPF:</strong> escala del ahorro de 2026 (19 % hasta 6.000 €, 21 % hasta 50.000 €, 23 % hasta 200.000 €, 27 % hasta 300.000 € y 30 % por encima), suponiendo que esta ganancia es lo único que tienes en la base del ahorro ese año.</li>
+      <li class="scale" id="ipcInfo"></li>
+    </ul>
+    <h2>Lo que no tiene en cuenta</h2>
+    <ul>
+      <li>Exenciones: venta de la vivienda habitual por mayores de 65 años o reinversión en otra vivienda habitual. Si te aplica alguna, puedes no tributar.</li>
+      <li>Compras anteriores a 1995: pueden aplicar coeficientes de abatimiento (disposición transitoria 9.ª), que reducen la ganancia. Antes de 2002 el IPC es aproximado.</li>
+      <li>Otras rentas del ahorro, pérdidas que compensar, herencias (el valor de adquisición es el declarado en el impuesto de sucesiones) y el régimen foral del País Vasco y Navarra.</li>
+      <li>Es una simulación divulgativa, no un cálculo de tu declaración ni asesoramiento fiscal.</li>
+    </ul>
+    <p>Datos: INE, IPC índice general nacional (serie IPC290751, base 2025) y variación mensual (IPC290752); escala de los arts. 66 y 76 de la Ley 35/2006 (BOE). Código y metodología: <a href="https://github.com/lpibarrondo-jpg/plusvalias-inflacion-datos">github.com/lpibarrondo-jpg/plusvalias-inflacion-datos</a>.</p>
+  </section>
+</main>
+
+<script>
+const IPC = {"1961-01":2.1197,"1961-02":2.1028,"1961-03":2.0943,"1961-04":2.1006,"1961-05":2.0943,"1961-06":2.0839,"1961-07":2.0839,"1961-08":2.088,"1961-09":2.0901,"1961-10":2.0985,"1961-11":2.132,"1961-12":2.1363,"1962-01":2.132,"1962-02":2.1427,"1962-03":2.162,"1962-04":2.1923,"1962-05":2.2208,"1962-06":2.2319,"1962-07":2.2319,"1962-08":2.2274,"1962-09":2.2408,"1962-10":2.2632,"1962-11":2.322,"1962-12":2.3522,"1963-01":2.3569,"1963-02":2.3758,"1963-03":2.4209,"1963-04":2.4185,"1963-05":2.433,"1963-06":2.3892,"1963-07":2.4155,"1963-08":2.4396,"1963-09":2.4347,"1963-10":2.442,"1963-11":2.4738,"1963-12":2.4837,"1964-01":2.4787,"1964-02":2.4812,"1964-03":2.4886,"1964-04":2.4986,"1964-05":2.5061,"1964-06":2.5387,"1964-07":2.5945,"1964-08":2.636,"1964-09":2.6624,"1964-10":2.705,"1964-11":2.7672,"1964-12":2.8004,"1965-01":2.8284,"1965-02":2.8765,"1965-03":2.8995,"1965-04":2.9198,"1965-05":2.9315,"1965-06":2.9198,"1965-07":2.9227,"1965-08":2.9373,"1965-09":2.9667,"1965-10":2.9815,"1965-11":3.0471,"1965-12":3.0654,"1966-01":3.0592,"1966-02":3.0562,"1966-03":3.0562,"1966-04":3.0868,"1966-05":3.1331,"1966-06":3.1393,"1966-07":3.1362,"1966-08":3.1425,"1966-09":3.133,"1966-10":3.1518,"1966-11":3.2054,"1966-12":3.2246,"1967-01":3.2279,"1967-02":3.2537,"1967-03":3.2667,"1967-04":3.3124,"1967-05":3.3224,"1967-06":3.2925,"1967-07":3.2958,"1967-08":3.3452,"1967-09":3.3552,"1967-10":3.3687,"1967-11":3.4394,"1967-12":3.4394,"1968-01":3.4497,"1968-02":3.4497,"1968-03":3.4842,"1968-04":3.5156,"1968-05":3.505,"1968-06":3.5155,"1968-07":3.4874,"1968-08":3.4909,"1968-09":3.4839,"1968-10":3.4944,"1968-11":3.5188,"1968-12":3.5435,"1969-01":3.5364,"1969-02":3.5152,"1969-03":3.5362,"1969-04":3.5787,"1969-05":3.5787,"1969-06":3.5357,"1969-07":3.564,"1969-08":3.5747,"1969-09":3.5819,"1969-10":3.5962,"1969-11":3.6286,"1969-12":3.6685,"1970-01":3.6868,"1970-02":3.6721,"1970-03":3.7014,"1970-04":3.7237,"1970-05":3.6976,"1970-06":3.7124,"1970-07":3.7829,"1970-08":3.8434,"1970-09":3.8627,"1970-10":3.9013,"1970-11":3.913,"1970-12":3.9247,"1971-01":3.9679,"1971-02":3.9639,"1971-03":4.0075,"1971-04":4.0516,"1971-05":4.0759,"1971-06":4.0922,"1971-07":4.0922,"1971-08":4.1004,"1971-09":4.1496,"1971-10":4.1953,"1971-11":4.254,"1971-12":4.3093,"1972-01":4.3136,"1972-02":4.3093,"1972-03":4.3524,"1972-04":4.3524,"1972-05":4.3742,"1972-06":4.3829,"1972-07":4.4443,"1972-08":4.4887,"1972-09":4.5515,"1972-10":4.5834,"1972-11":4.5926,"1972-12":4.6293,"1973-01":4.6617,"1973-02":4.671,"1973-03":4.7084,"1973-04":4.7743,"1973-05":4.8459,"1973-06":4.9186,"1973-07":4.9727,"1973-08":5.0523,"1973-09":5.1382,"1973-10":5.2204,"1973-11":5.2256,"1973-12":5.2831,"1974-01":5.3148,"1974-02":5.3307,"1974-03":5.448,"1974-04":5.5679,"1974-05":5.6403,"1974-06":5.6628,"1974-07":5.7308,"1974-08":5.8282,"1974-09":5.9215,"1974-10":5.9866,"1974-11":6.1542,"1974-12":6.2404,"1975-01":6.3277,"1975-02":6.391,"1975-03":6.4358,"1975-04":6.5516,"1975-05":6.6302,"1975-06":6.6501,"1975-07":6.7565,"1975-08":6.8646,"1975-09":6.9744,"1975-10":6.9744,"1975-11":7.0233,"1975-12":7.1356,"1976-01":7.2213,"1976-02":7.3007,"1976-03":7.4686,"1976-04":7.618,"1976-05":7.9684,"1976-06":7.9206,"1976-07":7.9681,"1976-08":8.0319,"1976-09":8.1845,"1976-10":8.2991,"1976-11":8.4567,"1976-12":8.5413,"1977-01":8.8232,"1977-02":8.9555,"1977-03":9.1705,"1977-04":9.3355,"1977-05":9.4195,"1977-06":9.6833,"1977-07":10.0028,"1977-08":10.3229,"1977-09":10.4675,"1977-10":10.6349,"1977-11":10.72,"1977-12":10.8058,"1978-01":10.9787,"1978-02":11.0885,"1978-03":11.2326,"1978-04":11.4685,"1978-05":11.5832,"1978-06":11.699,"1978-07":11.9564,"1978-08":12.1596,"1978-09":12.2569,"1978-10":12.3672,"1978-11":12.4167,"1978-12":12.5905,"1979-01":12.8046,"1979-02":12.907,"1979-03":13.0361,"1979-04":13.2316,"1979-05":13.3904,"1979-06":13.5109,"1979-07":13.8081,"1979-08":13.9462,"1979-09":14.1275,"1979-10":14.3112,"1979-11":14.3398,"1979-12":14.5549,"1980-01":14.9624,"1980-02":15.0971,"1980-03":15.1726,"1980-04":15.3243,"1980-05":15.4316,"1980-06":15.6785,"1980-07":15.898,"1980-08":16.0888,"1980-09":16.2657,"1980-10":16.3959,"1980-11":16.5598,"1980-12":16.7917,"1981-01":17.1275,"1981-02":17.2131,"1981-03":17.5574,"1981-04":17.733,"1981-05":17.8216,"1981-06":17.8395,"1981-07":18.1963,"1981-08":18.4146,"1981-09":18.5619,"1981-10":18.7661,"1981-11":18.935,"1981-12":19.219,"1982-01":19.6226,"1982-02":19.7796,"1982-03":19.9774,"1982-04":20.2371,"1982-05":20.5204,"1982-06":20.7256,"1982-07":20.9951,"1982-08":21.142,"1982-09":21.1632,"1982-10":21.3748,"1982-11":21.4389,"1982-12":21.9106,"1983-01":22.2831,"1983-02":22.3945,"1983-03":22.5288,"1983-04":22.8443,"1983-05":22.9356,"1983-06":23.0732,"1983-07":23.1655,"1983-08":23.4667,"1983-09":23.6544,"1983-10":23.9856,"1983-11":24.2254,"1983-12":24.613,"1984-01":24.9822,"1984-02":25.0822,"1984-03":25.2828,"1984-04":25.4092,"1984-05":25.5363,"1984-06":25.715,"1984-07":26.1008,"1984-08":26.2835,"1984-09":26.336,"1984-10":26.4941,"1984-11":26.6265,"1984-12":26.8129,"1985-01":27.3224,"1985-02":27.5136,"1985-03":27.6787,"1985-04":27.9555,"1985-05":28.0394,"1985-06":27.9833,"1985-07":28.1512,"1985-08":28.1793,"1985-09":28.4893,"1985-10":28.6317,"1985-11":28.8608,"1985-12":28.9762,"1986-01":29.8165,"1986-02":29.9358,"1986-03":30.0256,"1986-04":30.0857,"1986-05":30.1759,"1986-06":30.4475,"1986-07":30.752,"1986-08":30.8442,"1986-09":31.1527,"1986-10":31.2773,"1986-11":31.2147,"1986-12":31.3396,"1987-01":31.5903,"1987-02":31.7167,"1987-03":31.907,"1987-04":31.9708,"1987-05":31.9388,"1987-06":31.9388,"1987-07":32.2582,"1987-08":32.2582,"1987-09":32.5485,"1987-10":32.7438,"1987-11":32.6783,"1987-12":32.8091,"1988-01":33.0059,"1988-02":33.1049,"1988-03":33.3367,"1988-04":33.2367,"1988-05":33.2367,"1988-06":33.3696,"1988-07":33.8034,"1988-08":34.1414,"1988-09":34.4487,"1988-10":34.4832,"1988-11":34.4487,"1988-12":34.7243,"1989-01":35.141,"1989-02":35.1761,"1989-03":35.3872,"1989-04":35.4933,"1989-05":35.5288,"1989-06":35.7065,"1989-07":36.2778,"1989-08":36.3503,"1989-09":36.7502,"1989-10":36.8972,"1989-11":36.971,"1989-12":37.1188,"1990-01":37.49,"1990-02":37.715,"1990-03":37.8658,"1990-04":37.9416,"1990-05":37.9416,"1990-06":38.0554,"1990-07":38.5501,"1990-08":38.7043,"1990-09":39.1301,"1990-10":39.4822,"1990-11":39.4427,"1990-12":39.5216,"1991-01":39.9959,"1991-02":39.9559,"1991-03":40.0758,"1991-04":40.1559,"1991-05":40.2764,"1991-06":40.3972,"1991-07":40.882,"1991-08":41.0455,"1991-09":41.3739,"1991-10":41.6221,"1991-11":41.7054,"1991-12":41.7471,"1992-01":42.415,"1992-02":42.7119,"1992-03":42.8828,"1992-04":42.8399,"1992-05":42.9684,"1992-06":42.9684,"1992-07":43.0973,"1992-08":43.4852,"1992-09":43.8331,"1992-10":43.8769,"1992-11":43.9208,"1992-12":44.0525,"1993-01":44.449,"1993-02":44.449,"1993-03":44.6268,"1993-04":44.8053,"1993-05":44.9397,"1993-06":45.0296,"1993-07":45.2097,"1993-08":45.481,"1993-09":45.7539,"1993-10":45.9369,"1993-11":46.0288,"1993-12":46.2589,"1994-01":46.7215,"1994-02":46.7215,"1994-03":46.8617,"1994-04":47.0491,"1994-05":47.1432,"1994-06":47.1903,"1994-07":47.3791,"1994-08":47.6634,"1994-09":47.8064,"1994-10":47.902,"1994-11":47.9978,"1994-12":48.1898,"1995-01":48.6717,"1995-02":48.915,"1995-03":49.2085,"1995-04":49.4546,"1995-05":49.4546,"1995-06":49.504,"1995-07":49.504,"1995-08":49.6525,"1995-09":49.8511,"1995-10":49.9508,"1995-11":50.1007,"1995-12":50.251,"1996-01":50.5525,"1996-02":50.7042,"1996-03":50.907,"1996-04":51.2124,"1996-05":51.3661,"1996-06":51.3147,"1996-07":51.366,"1996-08":51.5201,"1996-09":51.6231,"1996-10":51.6748,"1996-11":51.6748,"1996-12":51.8298,"1997-01":51.9853,"1997-02":51.9333,"1997-03":51.9333,"1997-04":51.9333,"1997-05":51.9852,"1997-06":51.9852,"1997-07":52.0892,"1997-08":52.2976,"1997-09":52.559,"1997-10":52.559,"1997-11":52.6642,"1997-12":52.8222,"1998-01":52.9278,"1998-02":52.8219,"1998-03":52.8219,"1998-04":52.9276,"1998-05":52.9805,"1998-06":53.0335,"1998-07":53.2456,"1998-08":53.4054,"1998-09":53.4588,"1998-10":53.4588,"1998-11":53.4053,"1998-12":53.5655,"1999-01":53.7798,"1999-02":53.8336,"1999-03":54.0489,"1999-04":54.2651,"1999-05":54.2651,"1999-06":54.2651,"1999-07":54.4822,"1999-08":54.7001,"1999-09":54.8095,"1999-10":54.8095,"1999-11":54.9191,"1999-12":55.1937,"2000-01":55.3593,"2000-02":55.4146,"2000-03":55.6363,"2000-04":55.8589,"2000-05":55.9706,"2000-06":56.1385,"2000-07":56.4753,"2000-08":56.7012,"2000-09":56.8713,"2000-10":57.0419,"2000-11":57.156,"2000-12":57.3275,"2001-01":57.3275,"2001-02":57.4995,"2001-03":57.7295,"2001-04":58.0181,"2001-05":58.2502,"2001-06":58.4249,"2001-07":58.5418,"2001-08":58.6589,"2001-09":58.6589,"2001-10":58.6002,"2001-11":58.5416,"2001-12":58.7758,"2002-01":58.717,"2002-02":58.768,"2002-03":59.253,"2002-04":60.058,"2002-05":60.274,"2002-06":60.277,"2002-07":59.858,"2002-08":60.03,"2002-09":60.255,"2002-10":60.851,"2002-11":60.946,"2002-12":61.148,"2003-01":60.896,"2003-02":61.026,"2003-03":61.449,"2003-04":61.949,"2003-05":61.892,"2003-06":61.933,"2003-07":61.545,"2003-08":61.827,"2003-09":62.011,"2003-10":62.429,"2003-11":62.633,"2003-12":62.74,"2004-01":62.3,"2004-02":62.329,"2004-03":62.764,"2004-04":63.623,"2004-05":63.999,"2004-06":64.1,"2004-07":63.614,"2004-08":63.895,"2004-09":64.009,"2004-10":64.667,"2004-11":64.828,"2004-12":64.765,"2005-01":64.219,"2005-02":64.386,"2005-03":64.895,"2005-04":65.83,"2005-05":65.956,"2005-06":66.11,"2005-07":65.705,"2005-08":65.994,"2005-09":66.399,"2005-10":66.939,"2005-11":67.04,"2005-12":67.184,"2006-01":66.912,"2006-02":66.944,"2006-03":67.418,"2006-04":68.369,"2006-05":68.615,"2006-06":68.719,"2006-07":68.31,"2006-08":68.45,"2006-09":68.337,"2006-10":68.618,"2006-11":68.787,"2006-12":68.976,"2007-01":68.512,"2007-02":68.559,"2007-03":69.079,"2007-04":70.033,"2007-05":70.225,"2007-06":70.354,"2007-07":69.843,"2007-08":69.938,"2007-09":70.168,"2007-10":71.077,"2007-11":71.587,"2007-12":71.887,"2008-01":71.442,"2008-02":71.553,"2008-03":72.188,"2008-04":72.965,"2008-05":73.458,"2008-06":73.881,"2008-07":73.526,"2008-08":73.368,"2008-09":73.353,"2008-10":73.605,"2008-11":73.293,"2008-12":72.917,"2009-01":72.018,"2009-02":72.026,"2009-03":72.144,"2009-04":72.849,"2009-05":72.823,"2009-06":73.144,"2009-07":72.52,"2009-08":72.773,"2009-09":72.601,"2009-10":73.119,"2009-11":73.515,"2009-12":73.496,"2010-01":72.759,"2010-02":72.627,"2010-03":73.165,"2010-04":73.944,"2010-05":74.109,"2010-06":74.241,"2010-07":73.909,"2010-08":74.095,"2010-09":74.146,"2010-10":74.824,"2010-11":75.23,"2010-12":75.692,"2011-01":75.138,"2011-02":75.234,"2011-03":75.796,"2011-04":76.739,"2011-05":76.714,"2011-06":76.606,"2011-07":76.194,"2011-08":76.289,"2011-09":76.475,"2011-10":77.078,"2011-11":77.391,"2011-12":77.492,"2012-01":76.639,"2012-02":76.719,"2012-03":77.235,"2012-04":78.32,"2012-05":78.204,"2012-06":78.058,"2012-07":77.876,"2012-08":78.314,"2012-09":79.085,"2012-10":79.757,"2012-11":79.658,"2012-12":79.714,"2013-01":78.695,"2013-02":78.832,"2013-03":79.109,"2013-04":79.405,"2013-05":79.551,"2013-06":79.669,"2013-07":79.258,"2013-08":79.504,"2013-09":79.355,"2013-10":79.678,"2013-11":79.844,"2013-12":79.915,"2014-01":78.852,"2014-02":78.818,"2014-03":78.994,"2014-04":79.697,"2014-05":79.715,"2014-06":79.737,"2014-07":78.987,"2014-08":79.112,"2014-09":79.233,"2014-10":79.602,"2014-11":79.547,"2014-12":79.083,"2015-01":77.812,"2015-02":77.972,"2015-03":78.47,"2015-04":79.191,"2015-05":79.569,"2015-06":79.782,"2015-07":79.041,"2015-08":78.779,"2015-09":78.536,"2015-10":79.039,"2015-11":79.329,"2015-12":79.097,"2016-01":77.588,"2016-02":77.314,"2016-03":77.81,"2016-04":78.355,"2016-05":78.783,"2016-06":79.148,"2016-07":78.572,"2016-08":78.673,"2016-09":78.677,"2016-10":79.576,"2016-11":79.864,"2016-12":80.338,"2017-01":79.896,"2017-02":79.608,"2017-03":79.592,"2017-04":80.356,"2017-05":80.308,"2017-06":80.343,"2017-07":79.788,"2017-08":79.947,"2017-09":80.086,"2017-10":80.825,"2017-11":81.194,"2017-12":81.231,"2018-01":80.355,"2018-02":80.463,"2018-03":80.558,"2018-04":81.224,"2018-05":81.956,"2018-06":82.17,"2018-07":81.581,"2018-08":81.697,"2018-09":81.897,"2018-10":82.654,"2018-11":82.563,"2018-12":82.193,"2019-01":81.142,"2019-02":81.34,"2019-03":81.636,"2019-04":82.459,"2019-05":82.619,"2019-06":82.522,"2019-07":82.011,"2019-08":81.965,"2019-09":81.965,"2019-10":82.76,"2019-11":82.9,"2019-12":82.84,"2020-01":82.032,"2020-02":81.935,"2020-03":81.621,"2020-04":81.868,"2020-05":81.863,"2020-06":82.24,"2020-07":81.502,"2020-08":81.54,"2020-09":81.662,"2020-10":82.09,"2020-11":82.225,"2020-12":82.4,"2021-01":82.407,"2021-02":81.922,"2021-03":82.716,"2021-04":83.693,"2021-05":84.087,"2021-06":84.487,"2021-07":83.85,"2021-08":84.232,"2021-09":84.934,"2021-10":86.496,"2021-11":86.761,"2021-12":87.797,"2022-01":87.46,"2022-02":88.167,"2022-03":90.837,"2022-04":90.676,"2022-05":91.426,"2022-06":93.118,"2022-07":92.881,"2022-08":93.117,"2022-09":92.47,"2022-10":92.78,"2022-11":92.669,"2022-12":92.808,"2023-01":92.613,"2023-02":93.487,"2023-03":93.831,"2023-04":94.39,"2023-05":94.345,"2023-06":94.881,"2023-07":95.042,"2023-08":95.552,"2023-09":95.721,"2023-10":95.998,"2023-11":95.663,"2023-12":95.687,"2024-01":95.768,"2024-02":96.108,"2024-03":96.84,"2024-04":97.514,"2024-05":97.771,"2024-06":98.139,"2024-07":97.673,"2024-08":97.713,"2024-09":97.123,"2024-10":97.729,"2024-11":97.968,"2024-12":98.411,"2025-01":98.579,"2025-02":98.966,"2025-03":99.024,"2025-04":99.647,"2025-05":99.714,"2025-06":100.382,"2025-07":100.305,"2025-08":100.345,"2025-09":100.059,"2025-10":100.748,"2025-11":100.943,"2025-12":101.289,"2026-01":100.836,"2026-02":101.261,"2026-03":102.44,"2026-04":102.883,"2026-05":102.951,"2026-06":103.598,"2026-07":103.899,"2026-08":104.638,"2026-09":104.978};            // { "AAAA-MM": índice base 2025 }
+const EXACTO_DESDE = "2002-01"; // antes, encadenado con variaciones mensuales redondeadas
+const ULTIMO = "2026-09";
+const ESCALA = [[6000, .19], [50000, .21], [200000, .23], [300000, .27], [Infinity, .30]];
+const EJEMPLO = { cm: 6, ca: 2015, cp: 150000, cg: 10000, vm: +ULTIMO.slice(5), va: +ULTIMO.slice(0, 4), vp: 250000, vg: 7500 };
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function eur(x, dec = 0) {
+  const neg = x < 0, a = Math.abs(x);
+  const [ent, fr] = a.toFixed(dec).split(".");
+  const conPuntos = ent.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return (neg ? "−" : "") + conPuntos + (fr ? "," + fr : "") + " €";
+}
+function pct(x, dec = 0) { return (x * 100).toFixed(dec).replace(".", ",") + " %"; }
+function num(s) { const n = Number(String(s).replace(/\./g, "").replace(/\s|€/g, "").replace(",", ".")); return isFinite(n) ? n : NaN; }
+
+function cuota(base) {
+  let c = 0, prev = 0;
+  for (const [lim, t] of ESCALA) { if (base <= prev) break; c += (Math.min(base, lim) - prev) * t; prev = lim; }
+  return c;
+}
+
+function calcular(d) {
+  const kC = `${d.ca}-${String(d.cm).padStart(2, "0")}`, kV = `${d.va}-${String(d.vm).padStart(2, "0")}`;
+  const iC = IPC[kC], iV = IPC[kV];
+  const adq = d.cp + d.cg, trans = d.vp - d.vg;
+  const coef = iV / iC;
+  const adqAct = adq * coef;
+  const gNom = trans - adq;
+  const gReal = trans - adqAct;
+  const infl = adqAct - adq;
+  const tNow = gNom > 0 ? cuota(gNom) : 0;
+  const tReal = gReal > 0 ? cuota(gReal) : 0;
+  return { kC, kV, coef, adq, trans, adqAct, gNom, gReal, infl, tNow, tReal,
+           aprox: kC < EXACTO_DESDE };
+}
+
+const $ = id => document.getElementById(id);
+function opciones() {
+  const anios = [...new Set(Object.keys(IPC).map(k => +k.slice(0, 4)))];
+  for (const id of ["cm", "vm"]) $(id).innerHTML = MESES.map((m, i) => `<option value="${i + 1}">${m}</option>`).join("");
+  $("ca").innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join("");
+  $("va").innerHTML = anios.filter(a => a >= 2002).map(a => `<option value="${a}">${a}</option>`).join("");
+}
+function fijar(d) {
+  for (const k of ["cm", "ca", "vm", "va"]) $(k).value = d[k];
+  for (const k of ["cp", "cg", "vp", "vg"]) $(k).value = eur(d[k]).replace(" €", "");
+}
+function leer() {
+  return { cm: +$("cm").value, ca: +$("ca").value, cp: num($("cp").value), cg: num($("cg").value || 0),
+           vm: +$("vm").value, va: +$("va").value, vp: num($("vp").value), vg: num($("vg").value || 0) };
+}
+function fechaTxt(k) { return MESES[+k.slice(5) - 1] + " de " + k.slice(0, 4); }
+
+let ultimoTexto = "";
+function pintar() {
+  const d = leer();
+  const kC = `${d.ca}-${String(d.cm).padStart(2, "0")}`, kV = `${d.va}-${String(d.vm).padStart(2, "0")}`;
+  let error = "";
+  if (!(d.cp > 0) || !(d.vp > 0)) error = "Escribe el precio de compra y el de venta en euros, por ejemplo 180.000.";
+  else if (isNaN(d.cg) || isNaN(d.vg) || d.cg < 0 || d.vg < 0) error = "Los gastos deben ser una cantidad en euros, o 0.";
+  else if (!(kC in IPC)) error = "No hay IPC para esa fecha de compra. Elige una fecha anterior.";
+  else if (!(kV in IPC)) error = `El último IPC publicado es el de ${fechaTxt(ULTIMO)}. Elige una fecha de venta hasta ese mes.`;
+  else if (kV < kC) error = "La venta tiene que ser posterior a la compra.";
+  $("err").textContent = error;
+  if (error) return;
+
+  const r = calcular(d);
+  const subida = r.coef - 1;
+  const parteInfl = r.gNom > 0 ? Math.min(1, Math.max(0, r.infl / r.gNom)) : 0;
+
+  // Veredicto
+  let v;
+  if (r.gNom <= 0) {
+    v = `Vendes sin ganancia nominal: no pagas IRPF. Descontando la inflación, pierdes <span class="n-infl">${eur(-r.gReal)}</span> de poder adquisitivo.`;
+  } else if (r.gReal <= 0) {
+    v = `Hacienda ve ${eur(r.gNom)} de ganancia, pero toda es inflación: en términos reales pierdes ${eur(-r.gReal)} y aun así pagas <span class="n-infl">${eur(r.tNow)}</span> de IRPF.`;
+  } else {
+    v = `De tus ${eur(r.gNom)} de ganancia, <span class="n-infl">${eur(Math.min(r.infl, r.gNom))}</span> son inflación (${pct(parteInfl)}). Lo que de verdad ganas son <span class="n-real">${eur(r.gReal)}</span>.`;
+  }
+  $("verdict").innerHTML = v;
+
+  // Barra
+  const total = Math.max(r.gNom, 0);
+  const wI = total > 0 ? Math.min(r.infl, total) / total * 100 : 0;
+  $("segI").style.width = wI + "%";
+  $("segR").style.width = (total > 0 ? 100 - wI : 0) + "%";
+  $("barTitle").textContent = total > 0 ? `Ganancia que ve Hacienda: ${eur(total)}` : "Sin ganancia nominal";
+  $("barPct").textContent = total > 0 ? `${pct(parteInfl)} es inflación` : "";
+  $("bar").setAttribute("aria-label", total > 0 ? `De ${eur(total)} de ganancia, ${pct(parteInfl)} es inflación` : "Sin ganancia");
+
+  // Impuestos
+  $("tNow").textContent = eur(r.tNow);
+  $("tNowSub").textContent = r.gNom > 0 ? `Sobre ${eur(r.gNom)} de ganancia nominal (${pct(r.tNow / r.gNom, 1)}).` : "No hay ganancia que gravar.";
+  $("tReal").textContent = eur(r.tReal);
+  $("tRealSub").textContent = r.gReal > 0 ? `Sobre ${eur(r.gReal)} de ganancia real (${pct(r.tReal / r.gReal, 1)}).` : "No hay ganancia real que gravar.";
+  const extra = r.tNow - r.tReal;
+  let sello;
+  if (r.gNom <= 0) sello = "Sin IRPF por esta venta";
+  else if (r.gReal <= 0) sello = `Pagas ${eur(r.tNow)} sin ganar nada en términos reales`;
+  else sello = `${eur(extra)} de IRPF por inflación · tipo real del ${pct(r.tNow / r.gReal, 1)}`;
+  $("stamp").textContent = sello;
+
+  // Desglose
+  const filas = [
+    ["Valor de adquisición", "Precio de compra + gastos", eur(r.adq)],
+    ["Valor de transmisión", "Precio de venta − gastos", eur(r.trans)],
+    ["Subida de precios entre compra y venta", `IPC de ${fechaTxt(r.kC)} a ${fechaTxt(r.kV)} · ×${r.coef.toFixed(4).replace(".", ",")}`, pct(subida, 1)],
+    ["Tu compra en euros de hoy", "Lo que tendría que valer para no perder poder adquisitivo", eur(r.adqAct)],
+    ["Ganancia que ve Hacienda", "Transmisión − adquisición", eur(r.gNom)],
+    ["Parte que es inflación", "Compra en euros de hoy − compra", eur(r.infl)],
+    ["Ganancia real", "Transmisión − compra en euros de hoy", eur(r.gReal)],
+  ];
+  $("ledger").innerHTML = filas.map(([a, b, c], i) =>
+    `<tr${i === 6 ? ' class="total"' : ""}><td>${a}<span class="sub">${b}</span></td><td>${c}</td></tr>`).join("");
+
+  let avisos = `IPC de compra (${fechaTxt(r.kC)}): ${IPC[r.kC].toFixed(3).replace(".", ",")} · IPC de venta (${fechaTxt(r.kV)}): ${IPC[r.kV].toFixed(3).replace(".", ",")} · base 2025.`;
+  if (r.aprox) avisos += " Antes de 2002 el índice se reconstruye con las variaciones mensuales oficiales redondeadas: el resultado es aproximado.";
+  if (d.ca < 1995) avisos += " Compra anterior a 1995: podrían aplicarse coeficientes de abatimiento que reducen la ganancia; esta calculadora no los aplica.";
+  $("ipcInfo").textContent = avisos;
+
+  ultimoTexto = r.gNom > 0
+    ? `Compré en ${fechaTxt(r.kC)} por ${eur(r.adq)} y vendo en ${fechaTxt(r.kV)} por ${eur(r.trans)}. Hacienda ve ${eur(r.gNom)} de ganancia, pero ${eur(Math.min(r.infl, r.gNom))} (${pct(parteInfl)}) son solo inflación. IRPF: ${eur(r.tNow)}; descontando la inflación serían ${eur(r.tReal)}.`
+    : `Compré en ${fechaTxt(r.kC)} por ${eur(r.adq)} y vendo en ${fechaTxt(r.kV)} por ${eur(r.trans)}: sin ganancia nominal, y con la inflación pierdo ${eur(-r.gReal)} de poder adquisitivo.`;
+}
+
+opciones();
+fijar(EJEMPLO);
+for (const id of ["cm", "ca", "cp", "cg", "vm", "va", "vp", "vg"]) $(id).addEventListener("input", pintar);
+for (const id of ["cp", "cg", "vp", "vg"]) $(id).addEventListener("blur", e => { const n = num(e.target.value); if (isFinite(n) && e.target.value !== "") e.target.value = eur(n).replace(" €", ""); });
+$("f").addEventListener("submit", e => e.preventDefault());
+$("reset").addEventListener("click", () => { fijar(EJEMPLO); pintar(); });
+$("copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(ultimoTexto + " Calcúlalo tú: " + location.href); $("copied").textContent = "Copiado."; }
+  catch { $("copied").textContent = "Tu navegador no permite copiar desde aquí."; }
+});
+pintar();
+</script>
+</body>
+</html>

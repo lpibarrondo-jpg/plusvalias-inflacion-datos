@@ -16,6 +16,14 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Periodo medio de posesión de viviendas transmitidas | [Colegio de Registradores, Anuario ERI 2024](https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2024.pdf), resumen ejecutivo, p. 7 | 17,7 años (2024) | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
 
+## Calculadora
+
+`calculadora/index.html` es una página autónoma: cada persona introduce la fecha y el precio de compra y de venta de su vivienda (y, si quiere, los gastos) y ve qué parte de la ganancia es inflación, la ganancia real y el IRPF con la ley actual frente al que pagaría si se descontara la inflación. Aplica la escala del ahorro de 2026, como si esa ganancia fuera la única renta del ahorro del año, sin exenciones ni coeficientes de abatimiento.
+
+- Se genera con `python scripts/construir_calculadora.py`, que incrusta el IPC mensual del INE en la página a partir de `calculadora/plantilla.html`.
+- Desde enero de 2002 usa el índice oficial; antes lo reconstruye hacia atrás con la variación mensual oficial redondeada a un decimal, y la página avisa de que el resultado es aproximado.
+- Su lógica se comprobó contra un cálculo independiente en Python en cinco casos, incluido el del gráfico 4 (32.448 € de IRPF).
+
 ## Jurisprudencia
 
 La STC 67/2023 es la única sobre el IRPF y **desestimó** la cuestión: avaló que el impuesto no actualice con la inflación el valor de compra de los inmuebles. Las de la plusvalía municipal fueron favorables al contribuyente y se citan por contraste.
@@ -35,6 +43,7 @@ La STC 67/2023 es la única sobre el IRPF y **desestimó** la cuestión: avaló 
 data/raw/         Datos tal como los publica la fuente, sin modificar
 data/processed/   Tablas derivadas (Excel con fórmulas y tablas de cada gráfico)
 graficos/         Gráficos del artículo (PNG)
+calculadora/      Calculadora interactiva (index.html generado y su plantilla)
 scripts/          Scripts de descarga, cálculo y gráficos
 ```
 
