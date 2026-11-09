@@ -7,6 +7,7 @@ import csv, pathlib
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.ticker
 from matplotlib import font_manager
 from matplotlib.colors import BoundaryNorm, ListedColormap
 from matplotlib.patches import Patch
@@ -160,9 +161,63 @@ def grafico_mapa_calor(filas):
     plt.close(fig)
     return M
 
+# ---------- Gráfico 3: depósitos, rentabilidad real antes y después del IRPF ----------
+NARANJA = "#eb6834"
+TIPO_AHORRO_MIN = 0.19  # primer tramo de la escala del ahorro
+
+def tabla_depositos():
+    dep = list(csv.DictReader(open(RAIZ / "data" / "raw" / "bde_tipos_depositos_hogares_mensual.csv")))
+    def media(y, col):
+        v = [float(r[col]) for r in dep if r["fecha"].startswith(str(y))]
+        return sum(v) / len(v)
+    filas = []
+    ultimo_completo = int(ULT_FECHA[:4]) - 1
+    for y in range(2003, ultimo_completo + 1):
+        i = media(y, "plazo_hasta1a_nuevas") / 100
+        p = media_anual(y) / media_anual(y - 1) - 1
+        filas.append(dict(anio=y, tipo_deposito_1a=round(i, 6), inflacion_media=round(p, 6),
+                          real_antes_irpf=round((1 + i) / (1 + p) - 1, 6),
+                          real_despues_irpf=round((1 + i * (1 - TIPO_AHORRO_MIN)) / (1 + p) - 1, 6)))
+    with open(RAIZ / "data" / "processed" / "grafico3_depositos_real.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
+    return filas
+
+def grafico_depositos(filas):
+    import numpy as np
+    x = np.arange(len(filas)); w = 0.4
+    pre = [100 * f["real_antes_irpf"] for f in filas]; post = [100 * f["real_despues_irpf"] for f in filas]
+    n_neg = sum(v < 0 for v in post)
+    fig, ax = plt.subplots(figsize=(12, 7), dpi=150)
+    fig.subplots_adjust(left=0.08, right=0.97, top=0.76, bottom=0.17)
+    ax.bar(x - w / 2 - 0.01, pre, w, color=AZUL, label="Antes del IRPF", zorder=3)
+    ax.bar(x + w / 2 + 0.01, post, w, color=NARANJA, label="Después del IRPF (19 %)", zorder=3)
+    ax.axhline(0, color=EJE, lw=1, zorder=2)
+    k = [f["anio"] for f in filas].index(2022)
+    ax.annotate(f"2022: {es(post[k], 1)} %", (k - w, post[k]), xytext=(-6, 0), textcoords="offset points",
+                ha="right", va="center", fontsize=11, color=TINTA)
+    ax.set_xticks(x, [str(f["anio"]) if f["anio"] % 2 == 1 else "" for f in filas])
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{es(v)} %"))
+    ax.set_ylim(-8.5, 3.5)
+    ax.grid(axis="y", color=GRID, lw=0.8); ax.set_axisbelow(True)
+    for sp in ("top", "right", "left", "bottom"): ax.spines[sp].set_visible(False)
+    ax.tick_params(length=0, labelsize=11)
+    ax.legend(loc="upper right", frameon=False, fontsize=11, ncol=2)
+    fig.text(0.04, 0.93, f"En {n_neg} de {len(filas)} años, un depósito perdió poder adquisitivo después del IRPF",
+             fontsize=20, fontweight="bold", ha="left")
+    fig.text(0.04, 0.87, "Rentabilidad real anual de un depósito a plazo de hasta 1 año: el interés pagado por el banco, "
+             "descontada la inflación.\nEl IRPF grava el interés nominal aunque, descontada la inflación, el ahorrador pierda dinero.",
+             fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
+    pie(fig, "Fuente: Banco de España, Boletín Estadístico, cuadro 19.7 (TEDR de nuevas operaciones de depósitos a plazo de hogares "
+             "hasta 1 año, media anual)\ne INE (IPC, media anual). IRPF al 19 % (primer tramo de la base del ahorro). "
+             f"Cálculo propio. Datos y código: {REPO}")
+    fig.savefig(SALIDA / "03_depositos_rentabilidad_real.png")
+    plt.close(fig)
+    return n_neg
+
 if __name__ == "__main__":
     v = grafico_poder_adquisitivo()
     filas = tabla_tipo_efectivo()
     M = grafico_mapa_calor(filas)
     print("Gráfico 1: valor real hoy de 1.000 € de enero 2002 =", round(v, 2))
     print("Gráfico 2: mínimo", round(M.min(), 3), "máximo", round(M.max(), 3))
+    print("Gráfico 3: años con pérdida real tras IRPF =", grafico_depositos(tabla_depositos()))
