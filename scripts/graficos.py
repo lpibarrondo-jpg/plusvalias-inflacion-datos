@@ -17,7 +17,7 @@ SALIDA = RAIZ / "graficos"; SALIDA.mkdir(exist_ok=True)
 REPO = "github.com/lpibarrondo-jpg/plusvalias-inflacion-datos"
 
 # ---------- Estilo (paleta validada: rampa azul ordinal 250-650) ----------
-FUENTE = "Inter" if any("Inter" in f.name for f in font_manager.fontManager.ttflist) else "DejaVu Sans"
+FUENTE = "Inter" if any(f.name == "Inter" for f in font_manager.fontManager.ttflist) else "DejaVu Sans"
 SUP, TINTA, TINTA2, MUTED, GRID, EJE = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
 AZUL = "#2a78d6"
 RAMPA = ["#86b6ef", "#3987e5", "#1c5cab", "#0d366b"]
@@ -32,7 +32,7 @@ def es(x, dec=0):
 
 # ---------- Datos ----------
 ipc = [(r["fecha"], float(r["indice_base2025"]))
-       for r in csv.DictReader(open(RAIZ / "data" / "raw" / "ine_ipc_indice_general_mensual.csv"))]
+       for r in csv.DictReader(open(RAIZ / "data" / "raw" / "ine_ipc_indice_general_mensual.csv", encoding="utf-8"))]
 IDX = dict(ipc)
 ULT_FECHA, ULT = ipc[-1]
 MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
@@ -62,7 +62,7 @@ def grafico_poder_adquisitivo():
     base = IDX["2002-01"]
     xs = [int(f[:4]) + (int(f[5:]) - 1) / 12 for f, _ in ipc]
     ys = [1000 * base / v for _, v in ipc]
-    with open(RAIZ / "data" / "processed" / "grafico1_poder_adquisitivo_1000eur.csv", "w", newline="") as f:
+    with open(RAIZ / "data" / "processed" / "grafico1_poder_adquisitivo_1000eur.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f); w.writerow(["fecha", "valor_real_1000eur_ene2002"])
         w.writerows([(fe, round(y, 2)) for (fe, _), y in zip(ipc, ys)])
 
@@ -83,7 +83,7 @@ def grafico_poder_adquisitivo():
     for s in ("top", "right", "left"): ax.spines[s].set_visible(False)
     ax.tick_params(length=0, labelsize=11)
     perdida = 100 * (1 - ys[-1] / 1000)
-    fig.text(0.04, 0.92, f"1.000 € guardados en 2002 hoy compran lo que {es(ys[-1])} € entonces",
+    fig.text(0.04, 0.92, f"1.000 € guardados en enero de 2002 hoy compran lo que {es(ys[-1])} € entonces",
              fontsize=20, fontweight="bold", ha="left")
     fig.text(0.04, 0.855, f"Poder adquisitivo de 1.000 € sin invertir, medido con el IPC. "
              f"Han perdido un {es(perdida)} % de su valor real.", fontsize=12.5, color=TINTA2, ha="left")
@@ -115,7 +115,7 @@ def tabla_tipo_efectivo():
                               anios_tenencia=round(n, 2), precio_venta=round(venta), ganancia_nominal=round(g_nom),
                               ganancia_real=round(g_real), cuota_irpf=round(cuota),
                               tipo_sobre_nominal=round(cuota / g_nom, 4), tipo_sobre_real=round(cuota / g_real, 4)))
-    with open(RAIZ / "data" / "processed" / "grafico2_tipo_efectivo_real.csv", "w", newline="") as f:
+    with open(RAIZ / "data" / "processed" / "grafico2_tipo_efectivo_real.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
     return filas
 
@@ -166,7 +166,7 @@ NARANJA = "#eb6834"
 TIPO_AHORRO_MIN = 0.19  # primer tramo de la escala del ahorro
 
 def tabla_depositos():
-    dep = list(csv.DictReader(open(RAIZ / "data" / "raw" / "bde_tipos_depositos_hogares_mensual.csv")))
+    dep = list(csv.DictReader(open(RAIZ / "data" / "raw" / "bde_tipos_depositos_hogares_mensual.csv", encoding="utf-8")))
     def media(y, col):
         v = [float(r[col]) for r in dep if r["fecha"].startswith(str(y))]
         return sum(v) / len(v)
@@ -175,10 +175,19 @@ def tabla_depositos():
     for y in range(2003, ultimo_completo + 1):
         i = media(y, "plazo_hasta1a_nuevas") / 100
         p = media_anual(y) / media_anual(y - 1) - 1
-        filas.append(dict(anio=y, tipo_deposito_1a=round(i, 6), inflacion_media=round(p, 6),
-                          real_antes_irpf=round((1 + i) / (1 + p) - 1, 6),
-                          real_despues_irpf=round((1 + i * (1 - TIPO_AHORRO_MIN)) / (1 + p) - 1, 6)))
-    with open(RAIZ / "data" / "processed" / "grafico3_depositos_real.csv", "w", newline="") as f:
+        fila = dict(anio=y, tipo_deposito_1a=round(i, 6), inflacion_media=round(p, 6),
+                    real_antes_irpf=round((1 + i) / (1 + p) - 1, 6),
+                    real_despues_irpf=round((1 + i * (1 - TIPO_AHORRO_MIN)) / (1 + p) - 1, 6))
+        # Variante: el depósito vence al año siguiente, así que se compara con la inflación del año siguiente
+        if y + 1 <= ultimo_completo:
+            p2 = media_anual(y + 1) / media_anual(y) - 1
+            fila.update(inflacion_anio_siguiente=round(p2, 6),
+                        real_antes_irpf_desfasado=round((1 + i) / (1 + p2) - 1, 6),
+                        real_despues_irpf_desfasado=round((1 + i * (1 - TIPO_AHORRO_MIN)) / (1 + p2) - 1, 6))
+        else:
+            fila.update(inflacion_anio_siguiente="", real_antes_irpf_desfasado="", real_despues_irpf_desfasado="")
+        filas.append(fila)
+    with open(RAIZ / "data" / "processed" / "grafico3_depositos_real.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
     return filas
 
@@ -187,6 +196,8 @@ def grafico_depositos(filas):
     x = np.arange(len(filas)); w = 0.4
     pre = [100 * f["real_antes_irpf"] for f in filas]; post = [100 * f["real_despues_irpf"] for f in filas]
     n_neg = sum(v < 0 for v in post)
+    n_neg_pre = sum(v < 0 for v in pre)
+    n_giro = sum(a >= 0 > b for a, b in zip(pre, post))
     fig, ax = plt.subplots(figsize=(12, 7), dpi=150)
     fig.subplots_adjust(left=0.08, right=0.97, top=0.76, bottom=0.17)
     ax.bar(x - w / 2 - 0.01, pre, w, color=AZUL, label="Antes del IRPF", zorder=3)
@@ -204,8 +215,8 @@ def grafico_depositos(filas):
     ax.legend(loc="upper right", frameon=False, fontsize=11, ncol=2)
     fig.text(0.04, 0.93, f"En {n_neg} de {len(filas)} años, un depósito perdió poder adquisitivo después del IRPF",
              fontsize=20, fontweight="bold", ha="left")
-    fig.text(0.04, 0.87, "Rentabilidad real anual de un depósito a plazo de hasta 1 año: el interés pagado por el banco, "
-             "descontada la inflación.\nEl IRPF grava el interés nominal aunque, descontada la inflación, el ahorrador pierda dinero.",
+    fig.text(0.04, 0.87, "Rentabilidad real anual de un depósito a plazo de hasta 1 año: el interés pagado por el banco, descontada la inflación.\n"
+             f"En {n_neg_pre} de esos años ya perdía antes de impuestos; el IRPF, que grava el interés nominal, añadió {n_giro} y agravó el resto.",
              fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
     pie(fig, "Fuente: Banco de España, Boletín Estadístico, cuadro 19.7 (TEDR de nuevas operaciones de depósitos a plazo de hogares "
              "hasta 1 año, media anual)\ne INE (IPC, media anual). IRPF al 19 % (primer tramo de la base del ahorro). "
@@ -235,7 +246,7 @@ def tabla_escala():
         coef = ULT / media_anual(y)
         filas.append(dict(umbral_legal=u, vigente_desde=y, norma=norma, coef_ipc=round(coef, 4),
                           umbral_actualizado=round(u * coef)))
-    with open(RAIZ / "data" / "processed" / "tabla_escala_ahorro_actualizada.csv", "w", newline="") as f:
+    with open(RAIZ / "data" / "processed" / "tabla_escala_ahorro_actualizada.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
     return [f["umbral_actualizado"] for f in filas]
 
@@ -261,20 +272,20 @@ def grafico_medidas(lim_act, filas_mapa):
     fig.text(0.04, 0.86, f"IRPF a pagar en un mismo caso: piso comprado en 2002 por {es(PRECIO)} € y vendido en {ULT_TXT} por "
              f"{es(caso['precio_venta'])} €\n(un 0,5 % anual por encima de la inflación). El problema no está en los tipos, "
              "sino en gravar como ganancia lo que es inflación.", fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
-    pie(fig, "Fuente: BOE (arts. 66 y 76 LIRPF, versiones vigentes desde 2010) e INE (IPC). Tramos actualizados con el IPC "
-             "desde el año en que se fijaron.\nCálculo propio, mismo caso que el gráfico 2. "
-             f"Datos y código: {REPO}")
+    pie(fig, "Fuente: BOE (arts. 66 y 76 LIRPF, versiones desde 2010) e INE (IPC). Tramos actualizados con el IPC "
+             "desde el año en que se fijaron.\nCálculo propio, mismo caso que el gráfico 2 (rentabilidad real baja; "
+             f"el caso con un 2 %, en el README). Datos y código: {REPO}")
     fig.savefig(SALIDA / "04_que_arregla_cada_medida.png")
     plt.close(fig)
     return actual, escala, base
 
-# ---------- Bloque 7: cuánto de lo gravado en 2024 fue inflación (inmuebles) ----------
+# ---------- Bloque 7: cuánto de lo declarado en 2024 fue inflación (inmuebles) ----------
 # AEAT, Estadística de declarantes del IRPF 2024, bloque V; Registradores, Anuario ERI 2024 (periodo medio de posesión 17,7 años)
 TENENCIAS = [10, 15, 17.7]
 TIPOS_REF = (0.19, 0.21, 0.23)
 
 def tabla_inflacion_inmuebles():
-    aeat = list(csv.DictReader(open(RAIZ / "data" / "raw" / "aeat_irpf2024_transmisiones_por_activo.csv")))
+    aeat = list(csv.DictReader(open(RAIZ / "data" / "raw" / "aeat_irpf2024_transmisiones_por_activo.csv", encoding="utf-8")))
     g = lambda a, s, p: int(next(x["importe_eur"] for x in aeat if x["activo"] == a and x["seccion"] == s and x["partida"] == p))
     adq = g("inmuebles", "Operaciones sin beneficio fiscal", "Valor de Adquisición")
     gan = g("inmuebles", "Operaciones sin beneficio fiscal", "Resultado positivo")
@@ -282,7 +293,7 @@ def tabla_inflacion_inmuebles():
     filas = []
     for h in TENENCIAS:
         t = 2024.5 - h                      # ventas repartidas a lo largo de 2024: fecha media de compra
-        anio, mes = int(t), int((t - int(t)) * 12) + 1
+        anio, mes = int(t), int(round((t - int(t)) * 12, 6)) + 1
         mes = min(mes, 12)
         coef = i2024 / IDX[f"{anio}-{mes:02d}"]
         infl = adq * (coef - 1)
@@ -291,7 +302,7 @@ def tabla_inflacion_inmuebles():
                           ganancia_real=round(gan - infl), pct_inflacion=round(infl / gan, 4),
                           irpf_sobre_inflacion_19=round(infl * .19), irpf_sobre_inflacion_21=round(infl * .21),
                           irpf_sobre_inflacion_23=round(infl * .23)))
-    with open(RAIZ / "data" / "processed" / "grafico5_inflacion_plusvalias_inmuebles_2024.csv", "w", newline="") as f:
+    with open(RAIZ / "data" / "processed" / "grafico5_inflacion_plusvalias_inmuebles_2024.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
     return filas
 
@@ -312,17 +323,62 @@ def grafico_inflacion_inmuebles(filas):
     ax.set_xlim(0, gan * 1.32); ax.set_xticks([])
     for sp in ax.spines.values(): sp.set_visible(False)
     c = filas[-1]
-    fig.text(0.04, 0.92, f"El {es(c['pct_inflacion'] * 100)} % de las plusvalías inmobiliarias gravadas en 2024 sería inflación",
+    fig.text(0.04, 0.92, f"Entre el {es(filas[0]['pct_inflacion'] * 100)} % y el {es(c['pct_inflacion'] * 100)} % de las plusvalías inmobiliarias de 2024 sería inflación",
              fontsize=20, fontweight="bold", ha="left")
     fig.text(0.04, 0.86, f"Ganancias por venta de inmuebles declaradas en el IRPF de 2024 sin exenciones: {es(gan, 1)} mil millones de €. "
              "\nEn naranja, la parte que solo compensa la subida de precios desde la compra, según los años de tenencia.\n"
-             f"Con la tenencia media oficial, el IRPF cobró unos {es(c['irpf_sobre_inflacion_21'] / 1e9, 1)} mil millones de € sobre esa parte.",
+             f"Con la tenencia media oficial, el IRPF sobre esa parte rondaría {es(c['irpf_sobre_inflacion_21'] / 1e9, 1)} mil millones de € (estimación, sin compensar pérdidas).",
              fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
     pie(fig, "Fuente: AEAT, Estadística de los declarantes del IRPF 2024, bloque V (inmuebles, operaciones sin beneficio fiscal); "
              "Colegio de Registradores, Anuario ERI 2024\n(periodo medio de posesión 17,7 años); INE (IPC). IRPF estimado al 21 % (rango 19-23 %). "
              f"Cálculo propio. Datos y código: {REPO}")
     fig.savefig(SALIDA / "05_inflacion_en_plusvalias_inmuebles_2024.png")
     plt.close(fig)
+
+# Sensibilidad del gráfico 5 con la distribución de tenencias de los Registradores (Anuario ERI 2024, p. 7)
+TRAMOS_TENENCIA = [(0, 2, 0.0964), (2, 5, 0.1043), (5, 10, 0.1276), (10, None, 0.6717)]  # cola uniforme ajustada a la media
+MEDIA_TENENCIA = 17.7
+
+def sensibilidad_tenencia():
+    # IPC antes de 2002: se encadena hacia atrás con la variación mensual oficial (IPC290752, redondeada a un
+    # decimal, por lo que es aproximado): I(mes anterior) = I(mes) / (1 + variación del mes)
+    vals = {r["fecha"]: float(r["variacion_mensual_pct"]) / 100
+            for r in csv.DictReader(open(RAIZ / "data" / "raw" / "ine_ipc_variacion_mensual.csv", encoding="utf-8"))}
+    idx = dict(IDX)
+    idx["2001-12"] = IDX["2002-01"] / (1 + vals["2002-01"])
+    y, m = 2001, 12
+    while (y, m) > (1961, 1):
+        f = f"{y}-{m:02d}"
+        y2, m2 = (y, m - 1) if m > 1 else (y - 1, 12)
+        idx[f"{y2}-{m2:02d}"] = idx[f] / (1 + vals[f])
+        y, m = y2, m2
+    i2024 = media_anual(2024)
+    def factor(h):
+        t = 2024.5 - h
+        anio, mes = int(t), int(round((t - int(t)) * 12, 6)) + 1
+        return i2024 / idx[f"{anio}-{min(mes, 12):02d}"] - 1, idx[f"{anio}-{min(mes, 12):02d}"]
+    # cola: uniforme de 10 a T con la media total igual a 17,7
+    resto = sum(p * (a + b) / 2 for a, b, p in TRAMOS_TENENCIA[:-1])
+    T = 2 * (MEDIA_TENENCIA - resto) / TRAMOS_TENENCIA[-1][2] - 10
+    puntos = []
+    for a, b, p in TRAMOS_TENENCIA:
+        b = T if b is None else b
+        n = int(round((b - a) * 12))
+        for k in range(n):
+            puntos.append((a + (k + 0.5) / 12, p / n))
+    f_media = factor(MEDIA_TENENCIA)[0]
+    f_num = sum(w * factor(h)[0] for h, w in puntos)
+    # ponderado por valor: el precio de compra se supone proporcional al IPC del momento de compra
+    pesos = [(w * factor(h)[1], factor(h)[0]) for h, w in puntos]
+    f_val = sum(w * f for w, f in pesos) / sum(w for w, _ in pesos)
+    filas = [dict(metodo="media de 17,7 años", factor_inflacion=round(f_media, 4)),
+             dict(metodo="distribución de Registradores, ponderada por número de ventas", factor_inflacion=round(f_num, 4)),
+             dict(metodo="distribución de Registradores, ponderada por valor de compra (proporcional al IPC)", factor_inflacion=round(f_val, 4))]
+    for r in filas:
+        r["cola_hasta_anios"] = round(T, 2)
+    with open(RAIZ / "data" / "processed" / "grafico5_sensibilidad_tenencia.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
+    return filas
 
 if __name__ == "__main__":
     v = grafico_poder_adquisitivo()
@@ -335,4 +391,5 @@ if __name__ == "__main__":
     print("Umbrales actualizados:", lim)
     print("Gráfico 4 (actual, escala, base):", [round(v) for v in grafico_medidas(lim, filas)])
     fi = tabla_inflacion_inmuebles(); grafico_inflacion_inmuebles(fi)
+    for r in sensibilidad_tenencia(): print("Sensibilidad tenencia:", r)
     for f in fi: print("Gráfico 5:", f)
