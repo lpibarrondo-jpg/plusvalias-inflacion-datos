@@ -214,6 +214,60 @@ def grafico_depositos(filas):
     plt.close(fig)
     return n_neg
 
+# ---------- Bloque 6: escala del ahorro congelada y gráfico 4 ----------
+# Umbrales de la escala del ahorro y norma que los fijó (BOE, versiones de los arts. 66 y 76 LIRPF)
+UMBRALES = [(6_000, 2010, "Ley 26/2009 (BOE-A-2009-20765)"), (50_000, 2015, "Ley 26/2014 (BOE-A-2014-12327)"),
+            (200_000, 2021, "Ley 11/2020 (BOE-A-2020-17339)"), (300_000, 2023, "Ley 31/2022 (BOE-A-2022-22128)")]
+TIPOS = [t for _, t in ESCALA]
+
+def cuota_con(base, limites):
+    cuota, prev = 0.0, 0.0
+    for lim, t in zip(list(limites) + [float("inf")], TIPOS):
+        if base <= prev:
+            break
+        cuota += (min(base, lim) - prev) * t
+        prev = lim
+    return cuota
+
+def tabla_escala():
+    filas = []
+    for u, y, norma in UMBRALES:
+        coef = ULT / media_anual(y)
+        filas.append(dict(umbral_legal=u, vigente_desde=y, norma=norma, coef_ipc=round(coef, 4),
+                          umbral_actualizado=round(u * coef)))
+    with open(RAIZ / "data" / "processed" / "tabla_escala_ahorro_actualizada.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
+    return [f["umbral_actualizado"] for f in filas]
+
+def grafico_medidas(lim_act, filas_mapa):
+    caso = next(f for f in filas_mapa if f["anio_compra"] == 2002 and f["rentabilidad_real_anual"] == 0.005)
+    legal = [u for u, _, _ in UMBRALES]
+    actual = cuota_con(caso["ganancia_nominal"], legal)
+    escala = cuota_con(caso["ganancia_nominal"], lim_act)
+    base = cuota_con(caso["ganancia_real"], legal)
+    etiquetas = ["Hoy (ley vigente)", "Actualizando los tramos\nde la escala con el IPC", "Descontando la inflación\nde la ganancia"]
+    vals = [actual, escala, base]
+    fig, ax = plt.subplots(figsize=(12, 6.2), dpi=150)
+    fig.subplots_adjust(left=0.25, right=0.9, top=0.72, bottom=0.2)
+    y = list(range(len(vals)))[::-1]
+    ax.barh(y, vals, height=0.55, color=[AZUL, AZUL, "#86b6ef"], zorder=3)
+    for yi, v in zip(y, vals):
+        ax.text(v + 400, yi, f"{es(v)} €", va="center", fontsize=13, fontweight="bold", color=TINTA)
+    ax.set_yticks(y, etiquetas); ax.tick_params(length=0, labelsize=12, colors=TINTA2)
+    ax.set_xlim(0, max(vals) * 1.15); ax.set_xticks([])
+    for sp in ax.spines.values(): sp.set_visible(False)
+    fig.text(0.04, 0.92, f"Actualizar la escala ahorra {es(actual - escala)} €; descontar la inflación, {es(actual - base)} €",
+             fontsize=20, fontweight="bold", ha="left")
+    fig.text(0.04, 0.86, f"IRPF a pagar en un mismo caso: piso comprado en 2002 por {es(PRECIO)} € y vendido en {ULT_TXT} por "
+             f"{es(caso['precio_venta'])} €\n(un 0,5 % anual por encima de la inflación). El problema no está en los tipos, "
+             "sino en gravar como ganancia lo que es inflación.", fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
+    pie(fig, "Fuente: BOE (arts. 66 y 76 LIRPF, versiones vigentes desde 2010) e INE (IPC). Tramos actualizados con el IPC "
+             "desde el año en que se fijaron.\nCálculo propio, mismo caso que el gráfico 2. "
+             f"Datos y código: {REPO}")
+    fig.savefig(SALIDA / "04_que_arregla_cada_medida.png")
+    plt.close(fig)
+    return actual, escala, base
+
 if __name__ == "__main__":
     v = grafico_poder_adquisitivo()
     filas = tabla_tipo_efectivo()
@@ -221,3 +275,6 @@ if __name__ == "__main__":
     print("Gráfico 1: valor real hoy de 1.000 € de enero 2002 =", round(v, 2))
     print("Gráfico 2: mínimo", round(M.min(), 3), "máximo", round(M.max(), 3))
     print("Gráfico 3: años con pérdida real tras IRPF =", grafico_depositos(tabla_depositos()))
+    lim = tabla_escala()
+    print("Umbrales actualizados:", lim)
+    print("Gráfico 4 (actual, escala, base):", [round(v) for v in grafico_medidas(lim, filas)])

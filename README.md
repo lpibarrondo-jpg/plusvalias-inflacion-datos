@@ -13,7 +13,7 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Variación mensual del IPC 1961–2001 (contexto) | INE | IPC290752 | Descargado |
 | Tipos de interés de depósitos de hogares | [Banco de España](https://www.bde.es/webbe/es/estadisticas/temas/tipos-interes.html), Boletín Estadístico | Cuadro 19.7 (nuevas operaciones, TEDR: DN_1TI1T0010, DN_1TI2T0024 a DN_1TI2T0027) y cuadro 19.10 (saldos vivos, DN_1TI1T0060) | Descargado |
 | Ganancias patrimoniales declaradas en el IRPF | Agencia Tributaria, Estadística de declarantes del IRPF | Pendiente | Pendiente |
-| Escala del ahorro del IRPF | BOE, Ley 35/2006, art. 66 y 76 | Pendiente | Pendiente |
+| Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
 
 ## Estructura
 
@@ -50,6 +50,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `01_poder_adquisitivo_1000eur.png` | Valor real hoy de 1.000 € guardados sin invertir desde enero de 2002 | `grafico1_poder_adquisitivo_1000eur.csv` |
 | `02_tipo_efectivo_ganancia_real.png` | Cuota del IRPF dividida entre la ganancia real, por año de compra y rentabilidad real anual | `grafico2_tipo_efectivo_real.csv` |
 | `03_depositos_rentabilidad_real.png` | Rentabilidad real anual de un depósito a plazo de hasta 1 año, antes y después del IRPF | `grafico3_depositos_real.csv` |
+| `04_que_arregla_cada_medida.png` | IRPF del caso de 2002 con la ley vigente, con la escala actualizada y descontando la inflación de la ganancia | `tabla_escala_ahorro_actualizada.csv` |
 
 ### Supuestos del gráfico 2
 
@@ -66,6 +67,19 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 - Inflación: variación de la media anual del IPC respecto a la del año anterior.
 - Rentabilidad real antes del IRPF = (1 + tipo) / (1 + inflación) − 1.
 - Rentabilidad real después del IRPF = (1 + tipo × (1 − 0,19)) / (1 + inflación) − 1, con el 19 % del primer tramo de la base del ahorro.
+
+### Escala del ahorro y gráfico 4
+
+Umbrales de la escala del ahorro según las versiones de los arts. 66 y 76 LIRPF publicadas por el BOE, actualizados con el IPC desde la media del año en que entraron en vigor:
+
+| Umbral legal | Vigente desde | Norma | Umbral actualizado |
+| --- | --- | --- | --- |
+| 6.000 € | 2010 | Ley 26/2009 | 8.505 € |
+| 50.000 € | 2015 | Ley 26/2014 | 66.539 € |
+| 200.000 € | 2021 | Ley 11/2020 | 248.620 € |
+| 300.000 € | 2023 | Ley 31/2022 | 332.323 € |
+
+Los importes actualizados se recalculan con cada nueva descarga del IPC.
 
 ## Verificación del Banco de España
 
