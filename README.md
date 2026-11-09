@@ -16,6 +16,17 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Periodo medio de posesión de viviendas transmitidas | [Colegio de Registradores, Anuario ERI 2024](https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2024.pdf), resumen ejecutivo, p. 7 | 17,7 años (2024) | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
 
+## Jurisprudencia
+
+| Sentencia | Enlace | Copia local |
+| --- | --- | --- |
+| STC 67/2023, de 6 de junio (IRPF, coeficientes de actualización de inmuebles) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/29515) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2023-16398) | `data/raw/sentencias/BOE-A-2023-16398.xml` |
+| STC 221/1992, de 11 de diciembre (principio nominalista) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/2108) | |
+| STC 182/2021, de 26 de octubre (plusvalía municipal) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26840) | |
+| STC 59/2017, de 11 de mayo (plusvalía municipal) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25349) | |
+| STC 126/2019, de 31 de octubre (plusvalía municipal, cuota superior a la ganancia) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26072) | |
+| STC 26/2017, de 16 de febrero (plusvalía municipal, Gipuzkoa) | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25265) | |
+
 ## Estructura
 
 ```
