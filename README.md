@@ -31,11 +31,11 @@ La STC 67/2023 es la única sobre el IRPF y **desestimó** la cuestión: avaló 
 | Sentencia | Sentido del fallo | Enlace | Copia local |
 | --- | --- | --- | --- |
 | STC 67/2023, de 6 de junio (IRPF, coeficientes de actualización de inmuebles) | Desestima: es constitucional no corregir la inflación. Voto particular de dos magistrados | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/29515) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2023-16398) | `data/raw/sentencias/BOE-A-2023-16398.xml` |
-| STC 221/1992, de 11 de diciembre (plusvalía municipal) | Desestima: avala el principio nominalista salvo inflación «extrema» | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/2108) | |
-| STC 26/2017, de 16 de febrero (plusvalía municipal, Gipuzkoa) | Estima en parte: nula si grava incrementos inexistentes | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25265) | |
-| STC 59/2017, de 11 de mayo (plusvalía municipal) | Estima en parte: nula si grava incrementos inexistentes | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25349) | |
-| STC 126/2019, de 31 de octubre (plusvalía municipal) | Estima: inconstitucional cuando la cuota supera la ganancia | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26072) | |
-| STC 182/2021, de 26 de octubre (plusvalía municipal) | Estima: anula el método de cálculo de la base | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26840) | |
+| STC 221/1992, de 11 de diciembre (plusvalía municipal) | Desestima: avala el principio nominalista salvo inflación «extrema» | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/2108) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-T-1993-1242) | `data/raw/sentencias/BOE-T-1993-1242.xml` |
+| STC 26/2017, de 16 de febrero (plusvalía municipal, Gipuzkoa) | Estima en parte: nula si grava incrementos inexistentes | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25265) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2017-3255) | `data/raw/sentencias/BOE-A-2017-3255.xml` |
+| STC 59/2017, de 11 de mayo (plusvalía municipal) | Estima en parte: nula si grava incrementos inexistentes | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/25349) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2017-6855) | `data/raw/sentencias/BOE-A-2017-6855.xml` |
+| STC 126/2019, de 31 de octubre (plusvalía municipal) | Estima: inconstitucional cuando la cuota supera la ganancia | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26072) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2019-17639) | `data/raw/sentencias/BOE-A-2019-17639.xml` |
+| STC 182/2021, de 26 de octubre (plusvalía municipal) | Estima: anula el método de cálculo de la base | [TC](https://hj.tribunalconstitucional.es/es/Resolucion/Show/26840) · [BOE](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2021-19511) | `data/raw/sentencias/BOE-A-2021-19511.xml` |
 
 ## Estructura
 
