@@ -1,0 +1,9 @@
+escenario,anio_compra,precio_compra,precio_venta,ganancia_nominal,resultado_real,reinvertido,prestamo_pendiente,fraccion_exenta,base_gravada,irpf
+No reinvierte: pasa a vivir de alquiler (menor de 65),2007,200000,267200,67200,-27055,0,0,0.0,67200,14336
+Segunda vivienda: no hay exención,2007,200000,267200,67200,-27055,0,0,0.0,67200,14336
+Se muda a una vivienda de 200.000 €,2007,200000,267200,67200,-27055,200000,0,0.7485,16901,3429
+Se muda a una vivienda de 150.000 €,2007,200000,267200,67200,-27055,150000,0,0.5614,29475,6070
+"Igual, con 60.000 € de hipoteca pendiente",2007,200000,267200,67200,-27055,150000,60000,0.7239,18551,3776
+Compra otra de 267.200 € o más,2007,200000,267200,67200,-27055,267200,0,1.0,0,0
+Mayor de 65 que vende su vivienda habitual,2007,200000,267200,67200,-27055,0,0,1.0,0,0
+Contraste: compró en 2013 y compra otra más cara,2013,200000,415239,215239,155434,415239,0,1.0,0,0

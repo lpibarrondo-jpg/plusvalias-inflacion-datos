@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response>
+  <status>
+    <code>200</code>
+    <text>ok</text>
+  </status>
+  <data>
+    <bloque id="a38" tipo="precepto" titulo="Artículo 38">
+      <version id_norma="BOE-A-2006-20764" fecha_publicacion="20061129" fecha_vigencia="20070101">
+        <p class="articulo">Artículo 38. Reinversión en los supuestos de transmisión de vivienda habitual.</p>
+        <p class="parrafo">Podrán excluirse de gravamen las ganancias patrimoniales obtenidas por la transmisión de la vivienda habitual del contribuyente, siempre que el importe total obtenido por la transmisión se reinvierta en la adquisición de una nueva vivienda habitual en las condiciones que reglamentariamente se determinen.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total de lo percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+      </version>
+      <version id_norma="BOE-A-2013-10074" fecha_publicacion="20130928" fecha_vigencia="20130929">
+        <p class="articulo">Artículo 38. Reinversión en los supuestos de transmisión de vivienda habitual o de acciones o participaciones en empresas de nueva o reciente creación.</p>
+        <p class="parrafo">1. Podrán excluirse de gravamen las ganancias patrimoniales obtenidas por la transmisión de la vivienda habitual del contribuyente, siempre que el importe total obtenido por la transmisión se reinvierta en la adquisición de una nueva vivienda habitual en las condiciones que reglamentariamente se determinen.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total de lo percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+        <p class="parrafo">2. Podrán excluirse de gravamen las ganancias patrimoniales que se pongan de manifiesto con ocasión de la transmisión de acciones o participaciones por las que se hubiera practicado la deducción prevista en el artículo 68.1 de esta Ley, siempre que el importe total obtenido por la transmisión de las mismas se reinvierta en la adquisición de acciones o participaciones de las citadas entidades en las condiciones que reglamentariamente se determinen.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+        <p class="parrafo">No resultará de aplicación lo dispuesto en este apartado en los siguientes supuestos:</p>
+        <p class="parrafo_2">a) Cuando el contribuyente hubiera adquirido valores homogéneos en el año anterior o posterior a la transmisión de las acciones o participaciones. En este caso, la exención no procederá respecto de los valores que como consecuencia de dicha adquisición permanezcan en el patrimonio del contribuyente.</p>
+        <p class="parrafo">b) Cuando las acciones o participaciones se transmitan a su cónyuge, a cualquier persona unida al contribuyente por parentesco, en línea recta o colateral, por consanguinidad o afinidad, hasta el segundo grado incluido, a una entidad respecto de la que se produzca, con el contribuyente o con cualquiera de las personas anteriormente citadas, alguna de las circunstancias establecidas en el artículo 42 del Código de Comercio, con independencia de la residencia y de la obligación de formular cuentas anuales consolidadas, distinta de la propia entidad cuyas participaciones se transmiten.</p>
+        <blockquote>
+          <p class="nota_pie">Se modifica por el art. 27.2 de la Ley 14/2013, de 27 de septiembre. <a class="refPost">Ref. BOE-A-2013-10074</a>.</p>
+        </blockquote>
+      </version>
+      <version id_norma="BOE-A-2014-12327" fecha_publicacion="20141128" fecha_vigencia="20150101">
+        <p class="articulo">Artículo 38. Ganancias excluidas de gravamen en supuestos de reinversión.</p>
+        <p class="parrafo">1. Podrán excluirse de gravamen las ganancias patrimoniales obtenidas por la transmisión de la vivienda habitual del contribuyente, siempre que el importe total obtenido por la transmisión se reinvierta en la adquisición de una nueva vivienda habitual en las condiciones que reglamentariamente se determinen.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total de lo percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+        <p class="parrafo">2. Podrán excluirse de gravamen las ganancias patrimoniales que se pongan de manifiesto con ocasión de la transmisión de acciones o participaciones por las que se hubiera practicado la deducción prevista en el artículo 68.1 de esta Ley, siempre que el importe total obtenido por la transmisión de las mismas se reinvierta en la adquisición de acciones o participaciones de las citadas entidades en las condiciones que reglamentariamente se determinen.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+        <p class="parrafo">No resultará de aplicación lo dispuesto en este apartado en los siguientes supuestos:</p>
+        <p class="parrafo_2">a) Cuando el contribuyente hubiera adquirido valores homogéneos en el año anterior o posterior a la transmisión de las acciones o participaciones. En este caso, la exención no procederá respecto de los valores que como consecuencia de dicha adquisición permanezcan en el patrimonio del contribuyente.</p>
+        <p class="parrafo">b) Cuando las acciones o participaciones se transmitan a su cónyuge, a cualquier persona unida al contribuyente por parentesco, en línea recta o colateral, por consanguinidad o afinidad, hasta el segundo grado incluido, a una entidad respecto de la que se produzca, con el contribuyente o con cualquiera de las personas anteriormente citadas, alguna de las circunstancias establecidas en el artículo 42 del Código de Comercio, con independencia de la residencia y de la obligación de formular cuentas anuales consolidadas, distinta de la propia entidad cuyas participaciones se transmiten.</p>
+        <p class="parrafo">3. Podrán excluirse de gravamen las ganancias patrimoniales que se pongan de manifiesto con ocasión de la transmisión de elementos patrimoniales por contribuyentes mayores de 65 años, siempre que el importe total obtenido por la transmisión se destine en el plazo de seis meses a constituir una renta vitalicia asegurada a su favor, en las condiciones que reglamentariamente se determinen. La cantidad máxima total que a tal efecto podrá destinarse a constituir rentas vitalicias será de 240.000 euros.</p>
+        <p class="parrafo">Cuando el importe reinvertido sea inferior al total de lo percibido en la transmisión, únicamente se excluirá de tributación la parte proporcional de la ganancia patrimonial obtenida que corresponda a la cantidad reinvertida.</p>
+        <p class="parrafo">La anticipación, total o parcial, de los derechos económicos derivados de la renta vitalicia constituida, determinará el sometimiento a gravamen de la ganancia patrimonial correspondiente.</p>
+        <blockquote>
+          <p class="nota_pie">Se modifica el título y se añade el apartado 3 por el art. 1.24 de la Ley 26/2014, de 27 de noviembre. <a class="refPost">Ref. BOE-A-2014-12327</a>.</p>
+          <p class="nota_pie">Se modifica por el art. 27.2 de la Ley 14/2013, de 27 de septiembre. <a class="refPost">Ref. BOE-A-2013-10074</a>.</p>
+        </blockquote>
+      </version>
+    </bloque>
+  </data>
+</response>

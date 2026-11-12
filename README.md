@@ -59,6 +59,7 @@ python scripts/descargar_ipc.py        # descarga el IPC y su variación mensual
 python scripts/construir_hoja_ipc.py   # genera data/processed/IPC_Espana_base_INE.xlsx
 python scripts/graficos.py             # genera graficos/ y sus tablas en data/processed/
 python scripts/vender_con_perdidas.py  # gráfico 6: comprar en 2007-2008 y vender hoy, por CCAA
+python scripts/reinversion.py          # gráfico 7: escenarios con la exención por reinversión
 ```
 
 Requiere además `matplotlib` y `numpy` para los gráficos, y la fuente Inter para que los textos queden como en los PNG publicados. Con el Python de python.org en macOS, instala `certifi` (`pip install certifi`) para que la descarga del INE no falle por certificados.
@@ -80,6 +81,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `04_que_arregla_cada_medida.png` | IRPF del caso de 2002 con la ley vigente, con la escala actualizada y descontando la inflación de la ganancia | `tabla_escala_ahorro_actualizada.csv` |
 | `05_inflacion_en_plusvalias_inmuebles_2024.png` | Parte de las plusvalías inmobiliarias declaradas en 2024 que solo compensa la inflación, según años de tenencia | `grafico5_inflacion_plusvalias_inmuebles_2024.csv` |
 | `06_compra_2007_vende_hoy.png` (y `06_compra_2008_vende_hoy.png`) | Variación del precio de la vivienda en euros y descontada la inflación desde la media de 2007 (o 2008) hasta el último trimestre, por CCAA, y ejemplo de IRPF frente a Álava | `grafico6_compra_2007_venta_hoy.csv`, `grafico6_ejemplo_compra_2007.csv` (y los de 2008) |
+| `07_reinversion_vivienda_habitual.png` | IRPF de la venta de 2007 según se reinvierta todo, parte o nada en otra vivienda habitual, frente a un comprador de 2013 | `grafico7_reinversion.csv` |
 
 ### Supuestos del gráfico 2
 
@@ -134,6 +136,14 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - Ejemplo: vivienda de 200.000 € comprada en 2007 que evoluciona como el IPV nacional (+33,6 %): venta por 267.200 €, ganancia nominal de 67.200 €, IRPF de 14.336 € con la escala del ahorro de 2026 y pérdida real de 27.055 €. Con gastos (10 % al comprar, 3 % al vender): ganancia de 39.184 €, IRPF de 8.109 € y pérdida real de 64.497 €. En Álava el valor de adquisición actualizado (297.800 € sin gastos) supera al de venta: hay pérdida y no hay cuota.
 - No se aplican las exenciones por reinversión en vivienda habitual (art. 38 LIRPF) ni por transmisión de la vivienda habitual por mayores de 65 años (art. 33.4.b LIRPF): quien se acoge a ellas no tributa. El caso afecta sobre todo a segundas viviendas, inmuebles de inversión y viviendas habituales vendidas sin reinvertir (por ejemplo, para pasar a vivir de alquiler) por menores de 65 años.
 - Compraventas: el INE registró 775.300 compraventas de vivienda en 2007 y 552.080 en 2008 (ETDP, fecha de inscripción registral). No todas siguen en manos del mismo propietario ni todas se venderán con ganancia nominal: es la dimensión de la cohorte, no el número de afectados.
+
+### Supuestos del gráfico 7
+
+- Misma operación que el ejemplo del gráfico 6 (200.000 € en 2007, venta por 267.200 €, sin gastos), vendedor menor de 65 años salvo donde se indica.
+- Exención por reinversión (art. 38.1 LIRPF y art. 41.1 RIRPF, textos en `data/raw/boe/`): si se reinvierte menos de lo obtenido, solo se exime la parte proporcional de la ganancia. Si la vivienda vendida se compró con préstamo, el importe obtenido es el valor de transmisión menos el principal pendiente. La nueva vivienda puede pagarse con hipoteca: cuenta su precio total.
+- Mayores de 65 que venden su vivienda habitual: exentos (art. 33.4.b LIRPF), reinviertan o no.
+- La ley no prevé reducir el valor de adquisición de la nueva vivienda en la ganancia exenta: la exención es definitiva, no un aplazamiento (lectura del art. 35.1 LIRPF y del art. 41 RIRPF).
+- Contraste: la misma vivienda media comprada en 2013 (+107,6 % nominal, +59,8 % real) y reinvertida en una más cara no paga nada sobre 155.434 € de ganancia real.
 
 ### Verificación de la AEAT
 
