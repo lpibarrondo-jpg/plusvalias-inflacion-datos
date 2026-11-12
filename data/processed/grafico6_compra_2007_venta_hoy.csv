@@ -1,0 +1,21 @@
+territorio,anio_compra,periodo_venta,var_nominal,inflacion,var_real,categoria
+Nacional,2007,2026T2,0.336,0.4713,-0.0919,ganancia nominal y pérdida real: tributa
+Andalucía,2007,2026T2,0.5061,0.4713,0.0237,ganancia real
+Aragón,2007,2026T2,0.1054,0.4713,-0.2487,ganancia nominal y pérdida real: tributa
+"Asturias, Principado de",2007,2026T2,0.2685,0.4713,-0.1378,ganancia nominal y pérdida real: tributa
+"Balears, Illes",2007,2026T2,0.5731,0.4713,0.0692,ganancia real
+Canarias,2007,2026T2,0.4038,0.4713,-0.0458,ganancia nominal y pérdida real: tributa
+Cantabria,2007,2026T2,0.2791,0.4713,-0.1306,ganancia nominal y pérdida real: tributa
+Castilla y León,2007,2026T2,0.2068,0.4713,-0.1798,ganancia nominal y pérdida real: tributa
+Castilla - La Mancha,2007,2026T2,0.0826,0.4713,-0.2642,ganancia nominal y pérdida real: tributa
+Cataluña,2007,2026T2,0.1832,0.4713,-0.1958,ganancia nominal y pérdida real: tributa
+Comunitat Valenciana,2007,2026T2,0.3142,0.4713,-0.1067,ganancia nominal y pérdida real: tributa
+Extremadura,2007,2026T2,0.1754,0.4713,-0.2011,ganancia nominal y pérdida real: tributa
+Galicia,2007,2026T2,0.3215,0.4713,-0.1018,ganancia nominal y pérdida real: tributa
+"Madrid, Comunidad de",2007,2026T2,0.4083,0.4713,-0.0428,ganancia nominal y pérdida real: tributa
+"Murcia, Región de",2007,2026T2,0.3724,0.4713,-0.0672,ganancia nominal y pérdida real: tributa
+"Navarra, Comunidad Foral de",2007,2026T2,-0.0294,0.4713,-0.3403,régimen foral
+País Vasco,2007,2026T2,0.1138,0.4713,-0.2429,régimen foral
+"Rioja, La",2007,2026T2,0.1123,0.4713,-0.244,ganancia nominal y pérdida real: tributa
+Ceuta,2007,2026T2,0.6898,0.4713,0.1485,ganancia real
+Melilla,2007,2026T2,0.7051,0.4713,0.1589,ganancia real

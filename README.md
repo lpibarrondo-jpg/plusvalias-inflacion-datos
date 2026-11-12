@@ -14,6 +14,9 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Tipos de interés de depósitos de hogares | [Banco de España](https://www.bde.es/webbe/es/estadisticas/temas/tipos-interes.html), Boletín Estadístico | Cuadro 19.7 (nuevas operaciones, TEDR: DN_1TI1T0010, DN_1TI2T0024 a DN_1TI2T0027) y cuadro 19.10 (saldos vivos, DN_1TI1T0060) | Descargado |
 | Ganancias patrimoniales declaradas en el IRPF | AEAT, Estadística de los declarantes del IRPF 2024, bloque V: [tabla nacional](https://sede.agenciatributaria.gob.es/AEAT/Contenidos_Comunes/La_Agencia_Tributaria/Estadisticas/Publicaciones/sites/irpf/2024/jrubikf530a7632efff77b3f64b82f5ebaacf18d5b28fc9.html) e [inmuebles](https://sede.agenciatributaria.gob.es/AEAT/Contenidos_Comunes/La_Agencia_Tributaria/Estadisticas/Publicaciones/sites/irpf/2024/jrubikf68b5114b8e5bc6fad9e56a670a6783c3409020da.html) | «Detalle de las operaciones de transmisión de activos por tipo de activo subyacente» (total, inmuebles, valores, resto) | Descargado |
 | Periodo medio de posesión de viviendas transmitidas | [Colegio de Registradores, Anuario ERI 2024](https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2024.pdf), resumen ejecutivo, p. 7 | 17,7 años (2024) | Citado |
+| Índice de Precios de Vivienda (IPV), por CCAA | [INE](https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736152838&menu=resultados&idp=1254735976607) | Tabla 80271 (medias anuales, 2007-2025) y tabla 80270 (trimestral, hasta 2026 T2), base 2015, `data/raw/ine_ipv/` | Descargado |
+| Compraventas de viviendas | INE, Estadística de Transmisiones de Derechos de la Propiedad (ETDP) | ETDP1826, «Total Nacional. General. Compraventa. Número», mensual, `data/raw/ine_etdp/` | Descargado |
+| Coeficientes de actualización del IRPF de Álava (2026) | [Decreto Foral 41/2025](https://www.araba.eus/botha/Boletines/2025/146/2025_146_03735_C.pdf), BOTHA n.º 146, 26-12-2025, art. 1 (art. 45.2 de la Norma Foral 33/2013) | 2007: 1,489; 2008: 1,430 | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
 
 ## Calculadora
@@ -55,6 +58,7 @@ Requisitos: Python 3.10 o superior y `openpyxl`.
 python scripts/descargar_ipc.py        # descarga el IPC y su variación mensual desde la API del INE
 python scripts/construir_hoja_ipc.py   # genera data/processed/IPC_Espana_base_INE.xlsx
 python scripts/graficos.py             # genera graficos/ y sus tablas en data/processed/
+python scripts/vender_con_perdidas.py  # gráfico 6: comprar en 2007-2008 y vender hoy, por CCAA
 ```
 
 Requiere además `matplotlib` y `numpy` para los gráficos, y la fuente Inter para que los textos queden como en los PNG publicados. Con el Python de python.org en macOS, instala `certifi` (`pip install certifi`) para que la descarga del INE no falle por certificados.
@@ -75,6 +79,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `03_depositos_rentabilidad_real.png` | Rentabilidad real anual de un depósito a plazo de hasta 1 año, antes y después del IRPF | `grafico3_depositos_real.csv` |
 | `04_que_arregla_cada_medida.png` | IRPF del caso de 2002 con la ley vigente, con la escala actualizada y descontando la inflación de la ganancia | `tabla_escala_ahorro_actualizada.csv` |
 | `05_inflacion_en_plusvalias_inmuebles_2024.png` | Parte de las plusvalías inmobiliarias declaradas en 2024 que solo compensa la inflación, según años de tenencia | `grafico5_inflacion_plusvalias_inmuebles_2024.csv` |
+| `06_compra_2007_vende_hoy.png` (y `06_compra_2008_vende_hoy.png`) | Variación del precio de la vivienda en euros y descontada la inflación desde la media de 2007 (o 2008) hasta el último trimestre, por CCAA, y ejemplo de IRPF frente a Álava | `grafico6_compra_2007_venta_hoy.csv`, `grafico6_ejemplo_compra_2007.csv` (y los de 2008) |
 
 ### Supuestos del gráfico 2
 
@@ -120,6 +125,15 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - IRPF atribuible: componente de inflación × 21 % (rango 19-23 %, los tramos en que se integra la mayoría de estas ganancias). Es una estimación de lo que se habría gravado sobre esa parte, no una recaudación medida: no descuenta las pérdidas de inmuebles que se compensan en la base del ahorro (5.110 M€ imputables a 2024).
 - No se estiman valores (acciones y fondos) por falta de datos públicos sobre su periodo de tenencia. Tampoco se ajustan las operaciones con pérdidas, cuyas pérdidas reales también serían mayores.
 - Solo aparecen las ventas realizadas: quien acumula grandes plusvalías tiende a no vender para no tributar (efecto bloqueo), así que estas cifras no recogen las ganancias latentes.
+
+### Supuestos del gráfico 6
+
+- Precio: IPV del INE, índice general (vivienda nueva y de segunda mano). Compra = media anual de 2007 (o 2008); venta = último trimestre publicado (2026 T2). Inflación = IPC medio del trimestre de venta / IPC medio del año de compra (+47,1 % desde 2007; +41,4 % desde 2008).
+- El IPV mide precios medios a calidad constante. No dice qué le pasó a cada vivienda concreta: el gráfico describe la vivienda media de cada territorio, no a cada vendedor.
+- Categorías: «Paga IRPF y pierde» = la variación nominal es positiva (hay ganancia sujeta en el IRPF de territorio común) y la real es negativa. País Vasco y Navarra tienen IRPF foral y se muestran aparte: los territorios vascos actualizan el valor de adquisición con coeficientes (Álava: 1,489 para compras de 2007 vendidas en 2026). En Navarra el precio medio ni siquiera sube en euros.
+- Ejemplo: vivienda de 200.000 € comprada en 2007 que evoluciona como el IPV nacional (+33,6 %): venta por 267.200 €, ganancia nominal de 67.200 €, IRPF de 14.336 € con la escala del ahorro de 2026 y pérdida real de 27.055 €. Con gastos (10 % al comprar, 3 % al vender): ganancia de 39.184 €, IRPF de 8.109 € y pérdida real de 64.497 €. En Álava el valor de adquisición actualizado (297.800 € sin gastos) supera al de venta: hay pérdida y no hay cuota.
+- No se aplican las exenciones por reinversión en vivienda habitual (art. 38 LIRPF) ni por transmisión de la vivienda habitual por mayores de 65 años (art. 33.4.b LIRPF): quien se acoge a ellas no tributa. El caso afecta sobre todo a segundas viviendas, inmuebles de inversión y viviendas habituales vendidas sin reinvertir (por ejemplo, para pasar a vivir de alquiler) por menores de 65 años.
+- Compraventas: el INE registró 775.300 compraventas de vivienda en 2007 y 552.080 en 2008 (ETDP, fecha de inscripción registral). No todas siguen en manos del mismo propietario ni todas se venderán con ganancia nominal: es la dimensión de la cohorte, no el número de afectados.
 
 ### Verificación de la AEAT
 

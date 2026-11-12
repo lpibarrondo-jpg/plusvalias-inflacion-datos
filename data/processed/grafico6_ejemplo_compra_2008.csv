@@ -1,0 +1,3 @@
+variante,precio_compra,valor_adquisicion,precio_venta,valor_transmision,ganancia_nominal,resultado_real,irpf_comun,alava_valor_actualizado,alava_resultado,irpf_alava
+sin gastos,200000,200000,271304,271304,71304,-11428,15280,286000,-14696,0
+con gastos,200000,220000,271304,263165,43165,-47840,8945,314600,-51435,0
