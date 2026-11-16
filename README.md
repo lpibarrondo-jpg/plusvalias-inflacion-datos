@@ -15,6 +15,7 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Ganancias patrimoniales declaradas en el IRPF | AEAT, Estadística de los declarantes del IRPF 2024, bloque V: [tabla nacional](https://sede.agenciatributaria.gob.es/AEAT/Contenidos_Comunes/La_Agencia_Tributaria/Estadisticas/Publicaciones/sites/irpf/2024/jrubikf530a7632efff77b3f64b82f5ebaacf18d5b28fc9.html) e [inmuebles](https://sede.agenciatributaria.gob.es/AEAT/Contenidos_Comunes/La_Agencia_Tributaria/Estadisticas/Publicaciones/sites/irpf/2024/jrubikf68b5114b8e5bc6fad9e56a670a6783c3409020da.html) | «Detalle de las operaciones de transmisión de activos por tipo de activo subyacente» (total, inmuebles, valores, resto) | Descargado |
 | Periodo medio de posesión de viviendas transmitidas | [Colegio de Registradores, Anuario ERI 2024](https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2024.pdf), resumen ejecutivo, p. 7 | 17,7 años (2024) | Citado |
 | Índice de Precios de Vivienda (IPV), por CCAA | [INE](https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736152838&menu=resultados&idp=1254735976607) | Tabla 80271 (medias anuales, 2007-2025) y tabla 80270 (trimestral, hasta 2026 T2), base 2015, `data/raw/ine_ipv/` | Descargado |
+| Valor tasado medio de la vivienda libre por municipio | [Ministerio de Vivienda y Agenda Urbana](https://apps.fomento.gob.es/boletinonline2/?nivel=2&orden=35000000), Estadística de Valor Tasado de Vivienda | Tabla 35103500 (municipios de más de 25.000 habitantes, trimestral desde 2005, €/m², columna Total), `data/raw/mivau/` | Descargado |
 | Compraventas de viviendas | INE, Estadística de Transmisiones de Derechos de la Propiedad (ETDP) | ETDP1826, «Total Nacional. General. Compraventa. Número», mensual, `data/raw/ine_etdp/` | Descargado |
 | Coeficientes de actualización del IRPF de Álava (2026) | [Decreto Foral 41/2025](https://www.araba.eus/botha/Boletines/2025/146/2025_146_03735_C.pdf), BOTHA n.º 146, 26-12-2025, art. 1 (art. 45.2 de la Norma Foral 33/2013) | 2007: 1,489; 2008: 1,430 | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
@@ -60,6 +61,7 @@ python scripts/construir_hoja_ipc.py   # genera data/processed/IPC_Espana_base_I
 python scripts/graficos.py             # genera graficos/ y sus tablas en data/processed/
 python scripts/vender_con_perdidas.py  # gráfico 6: comprar en 2007-2008 y vender hoy, por CCAA
 python scripts/reinversion.py          # gráfico 7: escenarios con la exención por reinversión
+python scripts/ciudades.py             # gráfico 8: grandes ciudades (requiere xlrd)
 ```
 
 Requiere además `matplotlib` y `numpy` para los gráficos, y la fuente Inter para que los textos queden como en los PNG publicados. Con el Python de python.org en macOS, instala `certifi` (`pip install certifi`) para que la descarga del INE no falle por certificados.
@@ -82,6 +84,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `05_inflacion_en_plusvalias_inmuebles_2024.png` | Parte de las plusvalías inmobiliarias declaradas en 2024 que solo compensa la inflación, según años de tenencia | `grafico5_inflacion_plusvalias_inmuebles_2024.csv` |
 | `06_compra_2007_vende_hoy.png` (y `06_compra_2008_vende_hoy.png`) | Variación del precio de la vivienda en euros y descontada la inflación desde la media de 2007 (o 2008) hasta el último trimestre, por CCAA, y ejemplo de IRPF frente a Álava | `grafico6_compra_2007_venta_hoy.csv`, `grafico6_ejemplo_compra_2007.csv` (y los de 2008) |
 | `07_reinversion_vivienda_habitual.png` | IRPF de la venta de 2007 según se reinvierta todo, parte o nada en otra vivienda habitual, frente a un comprador de 2013 | `grafico7_reinversion.csv` |
+| `08_ciudades_irpf_sobre_ganancia_real.png` | IRPF dividido entre la ganancia real al vender hoy un piso de 80 m² en 15 ciudades, por año de compra | `grafico8_ciudades.csv` |
 
 ### Supuestos del gráfico 2
 
@@ -144,6 +147,14 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - Mayores de 65 que venden su vivienda habitual: exentos (art. 33.4.b LIRPF), reinviertan o no.
 - La ley no prevé reducir el valor de adquisición de la nueva vivienda en la ganancia exenta: la exención es definitiva, no un aplazamiento (lectura del art. 35.1 LIRPF y del art. 41 RIRPF).
 - Contraste: la misma vivienda media comprada en 2013 (+107,6 % nominal, +59,8 % real) y reinvertida en una más cara no paga nada sobre 155.434 € de ganancia real.
+
+### Supuestos del gráfico 8
+
+- Precio de compra = valor tasado medio de la vivienda libre del municipio (media de los cuatro trimestres del año de compra) × 80 m². Precio de venta = valor del último trimestre publicado (2026 T2) × 80 m². Fuente: Ministerio de Vivienda y Agenda Urbana, tabla 35103500. Desde 2010 la tabla separa viviendas de hasta 5 años y de más de 5; se usa siempre la columna Total.
+- Es valor de tasación, no precio de compraventa, y es la media de cada ciudad: cambia con la mezcla de viviendas tasadas cada trimestre y no sigue a una vivienda concreta.
+- Inflación: IPC medio del trimestre de venta / IPC medio del año de compra. IRPF: escala del ahorro de 2026 de territorio común, sin gastos ni exenciones.
+- Se excluyen las capitales vascas y Pamplona por su IRPF foral. Córdoba no aparece porque su serie está partida en el archivo original (provincia escrita de dos formas).
+- Contraste: con el Índice de Precios de Vivienda del INE (por comunidad autónoma), un piso de la Comunidad de Madrid comprado en 2007 sube un 40,8 % en euros, también por debajo de la inflación (47,1 %).
 
 ### Verificación de la AEAT
 
