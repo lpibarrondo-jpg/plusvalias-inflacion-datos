@@ -154,6 +154,7 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - Es valor de tasación, no precio de compraventa, y es la media de cada ciudad: cambia con la mezcla de viviendas tasadas cada trimestre y no sigue a una vivienda concreta.
 - Inflación: IPC medio del trimestre de venta / IPC medio del año de compra. IRPF: escala del ahorro de 2026 de territorio común, sin gastos ni exenciones.
 - Se excluyen las capitales vascas y Pamplona por su IRPF foral. Córdoba no aparece porque su serie está partida en el archivo original (provincia escrita de dos formas).
+- Sensibilidad: las casillas con poca ganancia real cambian mucho según el trimestre. Barcelona, compra en 2019: el IRPF se lleva el 78 % de la ganancia real vendiendo en 2026 T2, el 58 % vendiendo en 2026 T1 y entre el 69 % y el 84 % según el trimestre de compra de 2019 (la serie es estable, con entre 3.300 y 5.700 tasaciones por trimestre; sube un 35 % en euros frente a un 25,5 % de inflación). Palma, compra en 2007: ganancia real de 1.265 € en 2026 T2, de 4.025 € en 2026 T1 y pérdida real de 11.582 € en 2025 T4; en los tres casos el IRPF (17.000-21.600 €) recae casi entero sobre inflación.
 - Contraste: con el Índice de Precios de Vivienda del INE (por comunidad autónoma), un piso de la Comunidad de Madrid comprado en 2007 sube un 40,8 % en euros, también por debajo de la inflación (47,1 %).
 
 ### Verificación de la AEAT

@@ -89,7 +89,7 @@ def grafico(filas, ult):
             ax.add_patch(plt.Rectangle((j - 0.48, i - 0.46), 0.96, 0.92, color=bg, lw=0))
             if f["categoria"] == "sin ganancia": txt = "sin ganancia"
             elif f["categoria"] == "paga con pérdida real": txt = f"pierde y paga\n{es(f['irpf'])} €"
-            elif f["irpf_sobre_ganancia_real"] >= 1: txt = "IRPF mayor que\nla ganancia real"
+            elif f["irpf_sobre_ganancia_real"] >= 1: txt = f"gana {es(f['ganancia_real'])} € reales\ny paga {es(f['irpf'])} €"
             else: txt = f"{es(f['irpf_sobre_ganancia_real'] * 100)} %"
             ax.text(j, i, txt, ha="center", va="center", fontsize=11 if "\n" not in txt else 9.5, color=fg,
                     fontweight="bold" if f["categoria"] == "paga con pérdida real" else "normal", linespacing=1.2)
