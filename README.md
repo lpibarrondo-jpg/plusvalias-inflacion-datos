@@ -16,6 +16,7 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | Periodo medio de posesión de viviendas transmitidas | [Colegio de Registradores, Anuario ERI 2024](https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2024.pdf), resumen ejecutivo, p. 7 | 17,7 años (2024) | Citado |
 | Índice de Precios de Vivienda (IPV), por CCAA | [INE](https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736152838&menu=resultados&idp=1254735976607) | Tabla 80271 (medias anuales, 2007-2025) y tabla 80270 (trimestral, hasta 2026 T2), base 2015, `data/raw/ine_ipv/` | Descargado |
 | Valor tasado medio de la vivienda libre por municipio | [Ministerio de Vivienda y Agenda Urbana](https://apps.fomento.gob.es/boletinonline2/?nivel=2&orden=35000000), Estadística de Valor Tasado de Vivienda | Tabla 35103500 (municipios de más de 25.000 habitantes, trimestral desde 2005, €/m², columna Total), `data/raw/mivau/` | Descargado |
+| IBEX 35, cierre de cada mes | [Banco de España, Boletín Estadístico, cuadro 22.25](https://www.bde.es/webbe/es/estadisticas/otras-clasificaciones/publicaciones/boletin-estadistico/capitulo-22.html) (fuente: Sociedad Rectora de la Bolsa de Madrid) | `be2225.csv`, columna IBEX-35 (base 29-12-1989 = 3.000), 1987-2026, `data/raw/bde/` | Descargado |
 | Compraventas de viviendas | INE, Estadística de Transmisiones de Derechos de la Propiedad (ETDP) | ETDP1826, «Total Nacional. General. Compraventa. Número», mensual, `data/raw/ine_etdp/` | Descargado |
 | Coeficientes de actualización del IRPF de Álava (2026) | [Decreto Foral 41/2025](https://www.araba.eus/botha/Boletines/2025/146/2025_146_03735_C.pdf), BOTHA n.º 146, 26-12-2025, art. 1 (art. 45.2 de la Norma Foral 33/2013) | 2007: 1,489; 2008: 1,430 | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
@@ -62,6 +63,7 @@ python scripts/graficos.py             # genera graficos/ y sus tablas en data/p
 python scripts/vender_con_perdidas.py  # gráfico 6: comprar en 2007-2008 y vender hoy, por CCAA
 python scripts/reinversion.py          # gráfico 7: escenarios con la exención por reinversión
 python scripts/ciudades.py             # gráfico 8: grandes ciudades (requiere xlrd)
+python scripts/acciones.py             # gráfico 9: IBEX 35 por año de compra
 ```
 
 Requiere además `matplotlib` y `numpy` para los gráficos, y la fuente Inter para que los textos queden como en los PNG publicados. Con el Python de python.org en macOS, instala `certifi` (`pip install certifi`) para que la descarga del INE no falle por certificados.
@@ -85,6 +87,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `06_compra_2007_vende_hoy.png` (y `06_compra_2008_vende_hoy.png`) | Variación del precio de la vivienda en euros y descontada la inflación desde la media de 2007 (o 2008) hasta el último trimestre, por CCAA, y ejemplo de IRPF frente a Álava | `grafico6_compra_2007_venta_hoy.csv`, `grafico6_ejemplo_compra_2007.csv` (y los de 2008) |
 | `07_reinversion_vivienda_habitual.png` | IRPF de la venta de 2007 según se reinvierta todo, parte o nada en otra vivienda habitual, frente a un comprador de 2013 | `grafico7_reinversion.csv` |
 | `08_ciudades_irpf_sobre_ganancia_real.png` | IRPF dividido entre la ganancia real al vender hoy un piso de 80 m² en 15 ciudades, por año de compra | `grafico8_ciudades.csv` |
+| `09_ibex_inflacion_por_anio_compra.png` | 50.000 € invertidos en el IBEX 35 cada año de 1995 a 2024 y vendidos en septiembre de 2026: parte de la ganancia que es inflación e IRPF sobre la ganancia real | `grafico9_ibex_por_anio_compra.csv` |
 
 ### Supuestos del gráfico 2
 
@@ -156,6 +159,14 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - Se excluyen las capitales vascas y Pamplona por su IRPF foral. Córdoba no aparece porque su serie está partida en el archivo original (provincia escrita de dos formas).
 - Sensibilidad: las casillas con poca ganancia real cambian mucho según el trimestre. Barcelona, compra en 2019: el IRPF se lleva el 78 % de la ganancia real vendiendo en 2026 T2, el 58 % vendiendo en 2026 T1 y entre el 69 % y el 84 % según el trimestre de compra de 2019 (la serie es estable, con entre 3.300 y 5.700 tasaciones por trimestre; sube un 35 % en euros frente a un 25,5 % de inflación). Palma, compra en 2007: ganancia real de 1.265 € en 2026 T2, de 4.025 € en 2026 T1 y pérdida real de 11.582 € en 2025 T4; en los tres casos el IRPF (17.000-21.600 €) recae casi entero sobre inflación.
 - Contraste: con el Índice de Precios de Vivienda del INE (por comunidad autónoma), un piso de la Comunidad de Madrid comprado en 2007 sube un 40,8 % en euros, también por debajo de la inflación (47,1 %).
+
+### Supuestos del gráfico 9
+
+- IBEX 35 a fin de mes (Banco de España, cuadro 22.25). Es un índice de precios: no incluye dividendos, que tributan cada año como rendimientos del capital mobiliario. Para la ganancia patrimonial al vender solo cuenta el precio.
+- Cada año de compra: 50.000 € en 12 aportaciones iguales a fin de cada mes de ese año, no una compra en el máximo. Venta al cierre de septiembre de 2026 (19.426,2 puntos).
+- IPC: INE. Antes de 2002, encadenado hacia atrás con la variación mensual oficial (IPC290752), redondeada a un decimal: aproximado.
+- Sin comisiones, gastos ni compensación con otras pérdidas. Se excluyen compras anteriores a 1995 porque tienen régimen transitorio (DT 9ª LIRPF, abatimiento).
+- Resultado: el IRPF supera toda la ganancia real, o se paga con pérdida real, para compras en 1998, 1999, 2000, 2006 y 2007; se lleva más de la mitad en 2001, 2005 y 2008. En el resto oscila entre el 23 % y el 42 %.
 
 ### Verificación de la AEAT
 
