@@ -19,6 +19,7 @@ El objetivo es que cualquier persona pueda comprobar cada cifra del artículo pa
 | IBEX 35, cierre de cada mes | [Banco de España, Boletín Estadístico, cuadro 22.25](https://www.bde.es/webbe/es/estadisticas/otras-clasificaciones/publicaciones/boletin-estadistico/capitulo-22.html) (fuente: Sociedad Rectora de la Bolsa de Madrid) | `be2225.csv`, columna IBEX-35 (base 29-12-1989 = 3.000), 1987-2026, `data/raw/bde/` | Descargado |
 | Letras del Tesoro a 12 meses: tipo marginal de cada subasta | [Banco de España, estadísticas complementarias, cuadro ti_1_4](https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/ti_1_4.csv) | Serie diaria; solo días de subasta con dato, `data/raw/bde/` | Descargado |
 | Letras del Tesoro por tenedores (hogares e ISFLSH) | [Banco de España, Boletín Estadístico, cuadro 22.3](https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/be2203.csv) | Cartera firme, valor facial, mensual, `data/raw/bde/` | Descargado |
+| Intereses declarados y cuota del ahorro, IRPF 2019-2024 | AEAT, Estadística de los declarantes del IRPF, partidas 027, 030, 510, 540 y 541, total nacional (enlace de cada tabla en el CSV) | `data/raw/aeat_irpf_2019_2024_intereses_y_cuota_ahorro.csv` | Descargado |
 | Compraventas de viviendas | INE, Estadística de Transmisiones de Derechos de la Propiedad (ETDP) | ETDP1826, «Total Nacional. General. Compraventa. Número», mensual, `data/raw/ine_etdp/` | Descargado |
 | Coeficientes de actualización del IRPF de Álava (2026) | [Decreto Foral 41/2025](https://www.araba.eus/botha/Boletines/2025/146/2025_146_03735_C.pdf), BOTHA n.º 146, 26-12-2025, art. 1 (art. 45.2 de la Norma Foral 33/2013) | 2007: 1,489; 2008: 1,430 | Citado |
 | Escala del ahorro del IRPF | [BOE](https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764), Ley 35/2006, arts. 66 y 76, todas sus versiones (API de legislación consolidada) | `data/raw/boe/lirpf_a66.xml`, `lirpf_a76.xml` | Descargado |
@@ -67,6 +68,7 @@ python scripts/reinversion.py          # gráfico 7: escenarios con la exención
 python scripts/ciudades.py             # gráfico 8: grandes ciudades (requiere xlrd)
 python scripts/acciones.py             # gráfico 9: IBEX 35 por año de compra
 python scripts/letras.py               # gráfico 10: Letras del Tesoro a 12 meses
+python scripts/intereses_agregado.py   # gráfico 11: intereses declarados e IRPF frente a la inflación
 ```
 
 Requiere además `matplotlib` y `numpy` para los gráficos, y la fuente Inter para que los textos queden como en los PNG publicados. Con el Python de python.org en macOS, instala `certifi` (`pip install certifi`) para que la descarga del INE no falle por certificados.
@@ -92,6 +94,7 @@ Abre el Excel en Excel o LibreOffice para que se calculen las fórmulas. En la h
 | `08_ciudades_irpf_sobre_ganancia_real.png` | IRPF dividido entre la ganancia real al vender hoy un piso de 80 m² en 15 ciudades, por año de compra | `grafico8_ciudades.csv` |
 | `09_ibex_inflacion_por_anio_compra.png` | 50.000 € invertidos en el IBEX 35 cada año de 1995 a 2024 y vendidos en septiembre de 2026: parte de la ganancia que es inflación e IRPF sobre la ganancia real | `grafico9_ibex_por_anio_compra.csv` |
 | `10_letras_tesoro_real.png` | Letras a 12 meses subastadas de mayo de 2022 a septiembre de 2025: tipo, tipo tras IRPF e inflación durante su vida; Letras en manos de hogares | `grafico10_letras_12m.csv` |
+| `11_intereses_irpf_inflacion.png` | Intereses y Letras declarados en el IRPF 2019-2024, IRPF estimado al 19 % y tipo medio de los depósitos a plazo frente al IPC | `grafico11_intereses_irpf_inflacion.csv` |
 
 ### Supuestos del gráfico 2
 
@@ -179,6 +182,13 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - IRPF del 19 %, primer tramo de la base del ahorro (lo habitual para un ahorrador medio). Con tipos mayores el resultado empeora.
 - Desde mayo de 2022 (primera subasta a 12 meses con tipo positivo) hay 41 subastas: en 23 la letra pagó menos que la inflación y aun así tributó, y en 8 el IRPF convirtió una ganancia real pequeña en pérdida. Solo en 10 queda ganancia real después del impuesto.
 - Letras en manos de hogares e ISFLSH: 17 millones de euros en diciembre de 2021 y 24.428 millones en diciembre de 2023 (valor facial).
+
+### Supuestos del gráfico 11
+
+- Intereses: partidas 027 (intereses de cuentas, depósitos y activos financieros en general) y 030 (Letras del Tesoro) de la Estadística de los declarantes del IRPF, total nacional del territorio de régimen común. El saldo negativo de la partida 030 en 2022 (-14.005 €) se toma como cero.
+- IRPF estimado al 19 %, el tipo más bajo de la base del ahorro: es una cota inferior. El tipo medio efectivo de toda la base del ahorro fue del 21-22 % (cuota íntegra del ahorro / base liquidable del ahorro). No incluye las retenciones del 19 % soportadas por quienes no presentan declaración.
+- Comparación con la inflación: tipo medio de los depósitos a plazo de los hogares (saldos vivos, Banco de España) frente al IPC medio anual. Es una referencia agregada: no todos los intereses vienen de depósitos y algunas Letras sí batieron a la inflación (gráfico 10). Lo que se afirma es que, de media, el ahorro que paga intereses no ganó a la inflación en 2019 ni de 2021 a 2024.
+- Resultado: de 2021 a 2024, 11.591 millones de euros de intereses y Letras declarados y al menos 2.202 millones de IRPF.
 
 ### Verificación de la AEAT
 
