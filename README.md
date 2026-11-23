@@ -191,7 +191,7 @@ El gráfico 4 usa el caso de 2002 con un 0,5 % de rentabilidad real anual, un es
 - Intereses: partidas 027 (intereses de cuentas, depósitos y activos financieros en general) y 030 (Letras del Tesoro) de la Estadística de los declarantes del IRPF, total nacional del territorio de régimen común. El saldo negativo de la partida 030 en 2022 (-14.005 €) se toma como cero.
 - IRPF estimado al 19 %, el tipo más bajo de la base del ahorro: es una cota inferior. El tipo medio efectivo de toda la base del ahorro fue del 21-22 % (cuota íntegra del ahorro / base liquidable del ahorro). No incluye las retenciones del 19 % soportadas por quienes no presentan declaración.
 - Comparación con la inflación: tipo medio de los depósitos a plazo de los hogares (saldos vivos, Banco de España) frente al IPC medio anual. Es una referencia agregada: no todos los intereses vienen de depósitos y algunas Letras sí batieron a la inflación (gráfico 10). Lo que se afirma es que, de media, el ahorro que paga intereses no ganó a la inflación en 2019 ni de 2021 a 2024.
-- Resultado: de 2021 a 2024, 11.591 millones de euros de intereses y Letras declarados y al menos 2.202 millones de IRPF.
+- Resultado: de 2021 a 2024, 11.591 millones de euros de intereses y Letras declarados y al menos 2.202 millones de IRPF, en años en que el depósito a plazo medio perdió frente a la inflación. No se afirma que cada euro de esos intereses perdiera: parte de las Letras de 2023 sí ganaron a la inflación (gráfico 10) y en rentas bajas el mínimo personal puede reducir la cuota.
 
 ### Supuestos del gráfico 12
 
@@ -212,10 +212,12 @@ Los 285 meses (enero 2003 – septiembre 2026) de las seis series del fichero `b
 
 Antes de publicar, el repositorio pasó una auditoría independiente en solo lectura (Gemini y otra sesión de Claude), con el encargo de `AUDITORIA_GEMINI.md`. No encontró errores críticos. Sus correcciones (titular del gráfico 5 en rango, recuento del gráfico 3, sentido del fallo de la STC 67/2023, «habría gravado» en lugar de «cobró», enlaces de la AEAT y los hallazgos menores) están incorporadas.
 
+Segunda ronda (23-11-2026, gráficos 6 a 12 y calculadora): informe completo en `auditorias/2026-11-23_gemini_segunda_ronda.md`. Sin errores críticos; verificó a mano las cifras principales de cada gráfico. Correcciones incorporadas: titular del gráfico 11 («en años en que el depósito medio perdió frente a la inflación»), redondeo del tipo de 2023 en ese gráfico (1,11 %), dato del 26,5 % del importe en el gráfico 12 y nota sobre el uso del IPC de 1961-2001. Limitaciones que el propio informe declara: no ejecutó los scripts ni redescargó las fuentes; revisó la coherencia interna sobre extractos.
+
 ## Notas de metodología
 
 - **Cambio de base.** Desde enero de 2026 el INE publica el IPC en base 2025. Es un cambio de escala: las tasas de variación no cambian respecto a bases anteriores.
-- **Periodo.** El índice exacto empieza en enero de 2002. Para 1961–2001 el INE solo ofrece variaciones redondeadas a un decimal, que se incluyen como contexto y no se usan en los cálculos.
+- **Periodo.** El índice exacto empieza en enero de 2002. Para 1961–2001 el INE solo ofrece variaciones mensuales redondeadas a un decimal (IPC290752). Se usan, encadenadas hacia atrás desde enero de 2002 y por tanto de forma aproximada, en la sensibilidad del gráfico 5, en las compras de 1995 a 2001 del gráfico 9 y en la calculadora para fechas anteriores a 2002.
 - **Comparaciones.** Para un año completo se usa el índice medio anual; para una fecha concreta, el índice del mes.
 - **Último dato.** Septiembre de 2026 (definitivo). Octubre de 2026 solo tiene dato adelantado y no se usa en ningún cálculo, aunque aparece en los ficheros de variación descargados para verificación (`ine_IPC290750_variacion_anual_2003plus.txt` e `ine_ipc_variacion_mensual.csv`).
 

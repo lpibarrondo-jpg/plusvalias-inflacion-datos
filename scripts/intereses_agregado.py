@@ -25,14 +25,14 @@ def datos():
         filas.append(dict(ejercicio=y, intereses_027=imp["027"], letras_030=imp["030"], total_intereses=intereses,
                           irpf_19=round(intereses * T), cuota_ahorro_total=imp["540"] + imp["541"], base_liquidable_ahorro=imp["510"],
                           tipo_medio_ahorro=round((imp["540"] + imp["541"]) / imp["510"], 4),
-                          tipo_depositos_plazo_saldos=round(tipo, 3), ipc_medio_anual=round(ipc, 2)))
+                          tipo_depositos_plazo_saldos=round(tipo, 4), ipc_medio_anual=round(ipc, 2)))
     with open(RAIZ / "data" / "processed" / "grafico11_intereses_irpf_inflacion.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=filas[0].keys()); w.writeheader(); w.writerows(filas)
     return filas
 
 def grafico(filas):
     fig, ax = plt.subplots(figsize=(12.5, 9), dpi=150)
-    fig.subplots_adjust(left=0.08, right=0.97, top=0.72, bottom=0.235)
+    fig.subplots_adjust(left=0.08, right=0.97, top=0.68, bottom=0.235)
     x = [f["ejercicio"] for f in filas]
     a = [f["intereses_027"] / 1e6 for f in filas]; b = [max(f["letras_030"], 0) / 1e6 for f in filas]
     irpf = [f["irpf_19"] / 1e6 for f in filas]
@@ -55,9 +55,9 @@ def grafico(filas):
     ax.legend(loc="upper left", frameon=False, fontsize=10.5)
     p = [f for f in filas if f["ejercicio"] >= 2021]
     tot = sum(f["total_intereses"] for f in p) / 1e6; ir = sum(f["irpf_19"] for f in p) / 1e6
-    fig.text(0.04, 0.955, f"Al menos {es(ir)} millones de IRPF por intereses que no ganaron a la inflación (2021-2024)",
-             fontsize=19, fontweight="bold", ha="left", va="top")
-    fig.text(0.04, 0.905,
+    fig.text(0.04, 0.955, f"2021-2024: al menos {es(ir)} millones de IRPF por intereses,\nen años en que el depósito medio perdió frente a la inflación",
+             fontsize=19, fontweight="bold", linespacing=1.25, ha="left", va="top")
+    fig.text(0.04, 0.86,
              f"Los declarantes del IRPF ingresaron {es(tot)} millones de euros en intereses y Letras del Tesoro en esos cuatro años. "
              "En todos ellos, el tipo medio\nde los depósitos a plazo de los hogares estuvo por debajo de la inflación: de media, "
              "ese dinero no hizo más que intentar compensar la subida de precios.\nY aun así tributó como si fuera renta. "

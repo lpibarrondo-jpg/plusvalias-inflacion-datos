@@ -58,11 +58,11 @@ def grafico(fil, res):
     fig.text(0.04, 0.955, f"No es cosa de ricos: {es(pp * 100)} de cada 100 declaraciones con intereses son de rentas de 30.000 € o menos",
              fontsize=16.5, fontweight="bold", ha="left", va="top")
     fig.text(0.04, 0.905,
-             f"En 2024, {es(res['total_personas'] / 1e6, 1)} millones de declaraciones del IRPF incluyeron intereses de cuentas y depósitos. "
-             f"{es(res['hasta30_personas'] / 1e6, 1)} millones eran de rentas totales de 30.000 € o menos.\n"
-             f"Solo en las de 12.000 a 30.000 € ({es(res['medios_personas'] / 1e6, 2)} millones de declaraciones), los intereses sumaron {es(res['medios_importe'] / 1e6)} millones "
-             f"y el IRPF, al menos {es(res['medios_importe'] * 0.19 / 1e6)} millones,\nen un año en que el depósito a plazo medio pagaba un 2,09 % "
-             "con la inflación en el 2,8 %. Bajo cada tramo: interés medio declarado e IRPF al 19 %.",
+             f"En 2024, {es(res['total_personas'] / 1e6, 1)} millones de declaraciones del IRPF incluyeron intereses. "
+             f"{es(res['hasta30_personas'] / 1e6, 1)} millones eran de rentas de 30.000 € o menos (con el {es(res['hasta30_importe'] / res['total_importe'] * 100, 1)} % del importe).\n"
+             f"Solo en las de 12.000 a 30.000 € ({es(res['medios_personas'] / 1e6, 2)} millones), los intereses sumaron {es(res['medios_importe'] / 1e6)} millones "
+             f"y el IRPF, al menos {es(res['medios_importe'] * 0.19 / 1e6)} millones, en un año en que\n"
+             "el depósito a plazo medio pagaba un 2,09 % con la inflación en el 2,8 %. Bajo cada tramo: interés medio declarado e IRPF al 19 %.",
              fontsize=11.5, color=TINTA2, ha="left", va="top", linespacing=1.5)
     pie(fig, "Fuente: AEAT, Estadística de los declarantes del IRPF 2024, partida 027 (intereses de cuentas, depósitos y activos financieros en general), por tramos\n"
              "de rendimientos e imputaciones del declarante; territorio de régimen común. No incluye Letras del Tesoro (partida 030) ni a quienes no declaran.\n"
