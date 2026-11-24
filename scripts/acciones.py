@@ -100,7 +100,7 @@ def grafico(filas, venta, ix):
              "Encima de cada barra: IRPF dividido entre la ganancia real.\n"
              f"En {n_todo} años (1998-2000, burbuja puntocom, y 2006-2007) el impuesto supera toda la ganancia real o se paga con pérdida real: "
              f"quien invirtió en 2007\ngana un {es(y07['ganancia_nominal'] / INVERSION * 100)} % en euros, pierde un "
-             f"{es(-y07['ganancia_real'] / INVERSION * 100)} % en poder adquisitivo y paga {es(y07['irpf'])} € de IRPF. "
+             f"{es((1 - y07['valor_venta'] / (INVERSION * (1 + y07['inflacion_acumulada']))) * 100)} % en poder adquisitivo y paga {es(y07['irpf'])} € de IRPF. "
              "Sobre el papel, el tipo es del 19 % al 23 %;\nsobre la ganancia real nunca baja del 23 %, y para quien compró cerca de una burbuja se dispara.",
              fontsize=11.5, color=TINTA2, ha="left", va="top", linespacing=1.5)
     pie(fig, "Fuente: Banco de España, Boletín Estadístico, cuadro 22.25 (IBEX 35 a fin de mes; Sociedad Rectora de la Bolsa de Madrid); INE (IPC; antes de 2002, encadenado\n"

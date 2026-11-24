@@ -38,7 +38,7 @@ Para cada archivo de `data/raw/`, vuelve a descargar la fuente (o una muestra) y
 - **Gráfico 6:** recalcula a mano España y dos comunidades para compras de 2007 (variación nominal, inflación, variación real) y el ejemplo de 200.000 € (IRPF de 14.336 € y pérdida real de 27.055 €).
 - **Gráfico 7:** recalcula la exención proporcional (art. 41.1 RIRPF) en los casos de 150.000 €, 200.000 € y 150.000 € con 60.000 € de préstamo pendiente.
 - **Gráfico 8:** recalcula Madrid 2007 (307.594 €, 433.472 €, 27.832 €) y Madrid 2019 (260.458 €, 38.673 €, 36 %), y otras dos casillas.
-- **Gráfico 9:** recalcula 2007 (+31 % nominal, −19 % real, 3.091 € de IRPF) y 1999. Revisa el encadenamiento del IPC anterior a 2002.
+- **Gráfico 9:** recalcula 2007 (+31 % nominal, −13 % real, 3.091 € de IRPF) y 1999. Revisa el encadenamiento del IPC anterior a 2002.
 - **Gráfico 10:** recalcula tres subastas y el recuento (23 con pérdida real antes de impuestos, 8 convertidas en pérdida por el IRPF, 41 en total).
 - **Gráfico 11:** comprueba 11.591 millones de intereses (2021-2024) y 2.202 millones al 19 %.
 - **Gráfico 12:** comprueba 6.794.229 declaraciones, 3.719.116 (55 %) de rentas de 30.000 € o menos y 184 millones de IRPF en el tramo de 12.000 a 30.000 €.

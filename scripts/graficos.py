@@ -273,7 +273,7 @@ def grafico_medidas(lim_act, filas_mapa):
              f"{es(caso['precio_venta'])} €\n(un 0,5 % anual por encima de la inflación). El problema no está en los tipos, "
              "sino en gravar como ganancia lo que es inflación.", fontsize=12, color=TINTA2, ha="left", va="top", linespacing=1.45)
     pie(fig, "Fuente: BOE (arts. 66 y 76 LIRPF, versiones desde 2010) e INE (IPC). Tramos actualizados con el IPC "
-             "desde el año en que se fijaron.\nCálculo propio, mismo caso que el gráfico 2 (rentabilidad real baja; "
+             "desde el año en que se fijaron.\nCálculo propio con un escenario de rentabilidad real baja (0,5 % anual; "
              f"el caso con un 2 %, en el README). Datos y código: {REPO}")
     fig.savefig(SALIDA / "04_que_arregla_cada_medida.png")
     plt.close(fig)

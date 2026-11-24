@@ -214,6 +214,8 @@ Antes de publicar, el repositorio pasó una auditoría independiente en solo lec
 
 Segunda ronda (23-11-2026, gráficos 6 a 12 y calculadora): informe completo en `auditorias/2026-11-23_gemini_segunda_ronda.md`. Sin errores críticos; verificó a mano las cifras principales de cada gráfico. Correcciones incorporadas: titular del gráfico 11 («en años en que el depósito medio perdió frente a la inflación»), redondeo del tipo de 2023 en ese gráfico (1,11 %), dato del 26,5 % del importe en el gráfico 12 y nota sobre el uso del IPC de 1961-2001. Limitaciones que el propio informe declara: no ejecutó los scripts ni redescargó las fuentes; revisó la coherencia interna sobre extractos.
 
+Revisiones del borrador del artículo (24-11-2026): `auditorias/2026-11-24_revision_borrador_1.md` y `auditorias/2026-11-24_revision_borrador_2.pdf`. Correcciones incorporadas en el repositorio: la pérdida real de quien invirtió en el IBEX en 2007 es del 13 % de su poder adquisitivo (antes se expresaba, mal, como 19 %: eran 9.598 € de pérdida real por cada 50.000 € nominales invertidos) y el pie del gráfico 4 ya no remite al gráfico 2.
+
 ## Notas de metodología
 
 - **Cambio de base.** Desde enero de 2026 el INE publica el IPC en base 2025. Es un cambio de escala: las tasas de variación no cambian respecto a bases anteriores.
